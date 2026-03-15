@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Home</title>
+
+<link rel="stylesheet"
+href="F:\Call_Hub-WebDEv\static\css\style.css">
+
+</head>
+
+<body class="home-page">
+
+<!-- HEADER -->
+
+<header class="header">
+
+<div class="logo">
+
+<img src="https://labs.iitgn.ac.in/muselaboratory/wp-content/uploads/2020/10/iitgnlogo-emblem.png" height="60">
+
+<span>IITGN Dictionary</span>
+
+</div>
+
+<div class="user">
+
+Welcome {{username}}
+
+</div>
+
+</header>
+
+
+<!-- BODY -->
+
+<div class="content">
+
+<h2>Database Records</h2>
+
+<div class="table-container">
+
+<table>
+
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Email</th>
+</tr>
+
+{% for row in data %}
+
+<tr>
+<td>{{row.id}}</td>
+<td>{{row.name}}</td>
+<td>{{row.email}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+<div class="crud-box">
+<a href="/create">Create</a>
+</div>
+
+<div class="crud-box">
+<a href="/read">Read</a>
+</div>
+
+<div class="crud-box">
+<a href="/update">Update</a>
+</div>
+
+<div class="crud-box">
+<a href="/delete">Delete</a>
+</div>
+
+</footer>
+
+</body>
+
+</html>

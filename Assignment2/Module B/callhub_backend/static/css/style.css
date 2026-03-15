@@ -1,0 +1,285 @@
+/* LOGIN PAGE BACKGROUND */
+
+.login-page{
+
+margin:0;
+height:100vh;
+
+background-image:url("https://news.iitgn.ac.in/wp/wp-content/uploads/2019/07/ANK383_2224a-1280x640.jpg");
+background-size:cover;
+background-position:center;
+
+font-family:Arial;
+
+}
+
+/* DARK OVERLAY (60% visibility) */
+
+.overlay{
+
+width:100%;
+height:100%;
+
+background:rgba(0,0,0,0.6);
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+}
+
+/* LOGIN BOX */
+
+.login-box{
+
+background:white;
+
+padding:40px;
+width:320px;
+
+border-radius:8px;
+
+box-shadow:0px 5px 20px rgba(0,0,0,0.3);
+
+text-align:center;
+
+}
+
+/* INPUT */
+
+.login-box input{
+
+width:100%;
+padding:10px;
+margin:10px 0;
+
+border:1px solid #ccc;
+border-radius:5px;
+
+}
+
+/* BUTTON */
+
+.login-box button{
+
+width:100%;
+padding:10px;
+
+background:#ff6b35;
+color:white;
+
+border:none;
+border-radius:5px;
+
+font-size:16px;
+cursor:pointer;
+
+}
+
+.login-box button:hover{
+
+background:#e85c2c;
+
+}
+
+/* PAGE BACKGROUND */
+
+.home-page{
+
+margin:0;
+
+background-image:url("../images/bg.jpg");
+background-size:cover;
+background-position:center;
+
+font-family:Arial;
+
+}
+
+/* HEADER */
+
+.header{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+background:rgba(0,0,0,0.7);
+color:white;
+
+padding:15px 30px;
+
+}
+
+.logo{
+
+display:flex;
+align-items:center;
+gap:10px;
+
+font-size:18px;
+
+}
+
+.user{
+
+font-weight:bold;
+
+}
+
+/* BODY */
+
+.content{
+
+padding:30px;
+
+}
+
+/* SCROLLABLE DATABASE AREA */
+
+.table-container{
+
+max-height:350px;
+
+overflow-y:auto;
+
+background:white;
+
+padding:20px;
+
+border-radius:6px;
+
+}
+
+/* TABLE */
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+th,td{
+
+padding:10px;
+
+border-bottom:1px solid #ddd;
+
+}
+
+/* FOOTER CRUD */
+
+.footer{
+
+display:flex;
+
+justify-content:space-around;
+
+padding:20px;
+
+background:rgba(0,0,0,0.8);
+
+position:fixed;
+
+bottom:0;
+
+width:100%;
+
+}
+
+.crud-box{
+
+background:#ff6b35;
+
+color:white;
+
+padding:15px 25px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+}
+
+.crud-box a{
+
+color:white;
+
+text-decoration:none;
+
+font-weight:bold;
+
+}
+
+
+body
+{
+    font-family: Arial;
+    background-color: #f5f5f5;
+    margin: 0;
+}
+
+.header
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0,0,0,0.7);
+    color: white;
+    padding: 15px;
+}
+
+.logo
+{
+    height: 50px;
+}
+
+.user-info
+{
+    font-size: 16px;
+}
+
+.container
+{
+    width: 70%;
+    margin: auto;
+    margin-top: 50px;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+}
+
+button
+{
+    padding: 10px 20px;
+    background-color: #ff6b35;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover
+{
+    background-color: #ff6b35;
+}
+
+input
+{
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+}
+
+table
+{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td
+{
+    border: 1px solid gray;
+    padding: 10px;
+}

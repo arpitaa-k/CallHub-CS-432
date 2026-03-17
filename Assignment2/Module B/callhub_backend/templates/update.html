@@ -1,53 +1,56 @@
-<!DOCTYPE html>
-<html>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-<head>
-<title>Update Record</title>
-<link rel="stylesheet" href="F:\Call_Hub-WebDEv\static\css\style.css">
-</head>
+<h2>Update Member</h2>
 
-<body>
+<p id="msg"></p>
 
-<header class="header">
-
-<img src="https://labs.iitgn.ac.in/muselaboratory/wp-content/uploads/2020/10/iitgnlogo-emblem.png" class="logo">
-<h2>CallHub Dashboard</h2>
-
-<div class="user-info">
-Welcome {{username}}
-</div>
-
-</header>
-
-
-<div class="container">
-
-<h1>Update Record</h1>
-
-<form action="/update_member" method="POST">
+<form id="updateForm">
 
 <label>Member ID</label>
-<input type="number" name="id" required>
+<input type="number" id="id" required>
 
 <label>New Name</label>
-<input type="text" name="name">
-
-<label>New Email</label>
-<input type="email" name="email">
-
-<br><br>
+<input type="text" id="name">
 
 <button type="submit">Update</button>
 
 </form>
 
-<br>
+<script>
+fetch("/check-admin", {
+    credentials: "include"
+})
+.then(res=>res.json())
+.then(data=>{
+if(!data.is_admin){
+document.getElementById("msg").innerText = "You do NOT have update access"
+document.querySelector("form").style.display = "none"
+}
+})
 
-<a href="/home">
-<button>Back to Home</button>
-</a>
+document.getElementById("updateForm").addEventListener("submit", function(e){
 
-</div>
+e.preventDefault()
 
-</body>
-</html>
+let id = document.getElementById("id").value
+
+fetch(`/members/${id}`, {
+method:"PUT",
+credentials: "include",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+full_name: document.getElementById("name").value
+})
+})
+.then(res=>res.json())
+.then(data=>{
+if(data.message){
+window.location.href="/success"
+}else{
+alert(data.error)
+}
+})
+})
+</script>

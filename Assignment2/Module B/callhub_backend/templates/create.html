@@ -1,51 +1,59 @@
-<!DOCTYPE html>
-<html>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-<head>
-<title>Create Record</title>
-<link rel="stylesheet" href="F:\Call_Hub-WebDEv\static\css\style.css">
-</head>
+<h2>Create Member</h2>
 
-<body>
+<p id="msg"></p>
 
-<header class="header">
-<img src="https://labs.iitgn.ac.in/muselaboratory/wp-content/uploads/2020/10/iitgnlogo-emblem.png" class="logo">
-<h2>CallHub Dashboard</h2>
-
-<div class="user-info">
-Welcome {{username}}
-</div>
-</header>
-
-
-<div class="container">
-
-<h1>Create Record</h1>
-
-<form action="/create_member" method="POST">
+<form id="createForm">
 
 <label>Name</label>
-<input type="text" name="name" required>
+<input type="text" id="name" required>
 
-<label>Email</label>
-<input type="email" name="email" required>
+<label>Age</label>
+<input type="number" id="age" required>
 
-<label>Phone</label>
-<input type="text" name="phone">
-
-<br><br>
+<label>Dept ID</label>
+<input type="number" id="dept" required>
 
 <button type="submit">Create</button>
 
 </form>
 
-<br>
+<script>
+fetch("/check-admin", {
+    credentials: "include"
+})
+.then(res=>res.json())
+.then(data=>{
+if(!data.is_admin){
+document.getElementById("msg").innerText = "You do NOT have edit access"
+document.querySelector("form").style.display = "none"
+}
+})
 
-<a href="/home">
-<button>Back to Home</button>
-</a>
+document.getElementById("createForm").addEventListener("submit", function(e){
 
-</div>
+e.preventDefault()
 
-</body>
-</html>
+fetch("/members", {
+method:"POST",
+credentials: "include",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+full_name: document.getElementById("name").value,
+age: document.getElementById("age").value,
+dept_id: document.getElementById("dept").value
+})
+})
+.then(res=>res.json())
+.then(data=>{
+if(data.message){
+window.location.href="/success"
+}else{
+alert(data.error)
+}
+})
+})
+</script>

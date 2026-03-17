@@ -39,6 +39,17 @@ def login():
     return jsonify({"error":"Invalid password"}),401
 
 
+
+@auth.route("/check-admin")
+def check_admin():
+
+    if "member_id" not in session:
+        return {"is_admin": False}
+
+    from utils.rbac import is_admin
+
+    return {"is_admin": is_admin(session["member_id"])}
+
 @auth.route("/register", methods=["POST"])
 def register():
 

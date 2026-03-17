@@ -1,58 +1,66 @@
-<!DOCTYPE html>
-<html>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-<head>
-<title>View Records</title>
-<link rel="stylesheet" href="F:\Call_Hub-WebDEv\static\css\style.css">
-</head>
+<h2>Members List</h2>
 
-<body>
+<input type="text" id="search" placeholder="Search by name">
+<button onclick="searchMember()">Search</button>
 
-<header class="header">
-
-<img src="https://labs.iitgn.ac.in/muselaboratory/wp-content/uploads/2020/10/iitgnlogo-emblem.png" class="logo">
-<h2>CallHub Dashboard</h2>
-
-<div class="user-info">
-Welcome {{username}}
-</div>
-
-</header>
-
-
-<div class="container">
-
-<h1>Database Records</h1>
-
-<table>
-
+<table border="1" id="membersTable">
 <tr>
 <th>ID</th>
 <th>Name</th>
-<th>Email</th>
-<th>Phone</th>
+<th>Designation</th>
 </tr>
-
-{% for row in members %}
-
-<tr>
-<td>{{row.id}}</td>
-<td>{{row.name}}</td>
-<td>{{row.email}}</td>
-<td>{{row.phone}}</td>
-</tr>
-
-{% endfor %}
-
 </table>
 
-<br>
+<script>
 
-<a href="/home">
-<button>Back to Home</button>
-</a>
+function loadMembers(){
+fetch("/check-admin", {
+    credentials: "include"
+})
+.then(res=>res.json())
+.then(data=>{
 
-</div>
+let table = document.getElementById("membersTable")
 
-</body>
-</html>
+data.forEach(member=>{
+let row = table.insertRow()
+
+row.insertCell(0).innerText = member[0]
+row.insertCell(1).innerText = member[1]
+row.insertCell(2).innerText = member[2]
+})
+})
+}
+
+function searchMember(){
+
+let name = document.getElementById("search").value
+
+fetch(`/search?name=${name}`, {
+    credentials: "include"
+})
+.then(res=>res.json())
+.then(data=>{
+
+let table = document.getElementById("membersTable")
+table.innerHTML = `
+<tr>
+<th>ID</th>
+<th>Name</th>
+</tr>
+`
+
+data.forEach(member=>{
+let row = table.insertRow()
+
+row.insertCell(0).innerText = member[0]
+row.insertCell(1).innerText = member[1]
+})
+})
+}
+
+loadMembers()
+
+</script>

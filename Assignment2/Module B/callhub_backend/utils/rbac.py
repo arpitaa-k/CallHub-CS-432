@@ -31,8 +31,11 @@ def is_admin(member_id):
 
     roles = cur.fetchall()
 
+    admin_roles = ["admin", "director", "dean academics", "registrar"]
+    print("ROLES FROM DB:", roles)
     for role in roles:
-        if role[0].lower() == "admin":
+        if role[0].lower() in admin_roles:
             return True
+    
 
     return False

@@ -1,47 +1,46 @@
-<!DOCTYPE html>
-<html>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-<head>
-<title>Delete Record</title>
-<link rel="stylesheet" href="F:\Call_Hub-WebDEv\static\css\style.css">
-</head>
+<h2>Delete Member</h2>
 
-<body>
+<p id="msg"></p>
 
-<header class="header">
-
-<img src="https://labs.iitgn.ac.in/muselaboratory/wp-content/uploads/2020/10/iitgnlogo-emblem.png" class="logo">
-<h2>CallHub Dashboard</h2>
-
-<div class="user-info">
-Welcome {{username}}
-</div>
-
-</header>
-
-
-<div class="container">
-
-<h1>Delete Record</h1>
-
-<form action="/delete_member" method="POST">
+<form id="deleteForm">
 
 <label>Member ID</label>
-<input type="number" name="id" required>
-
-<br><br>
+<input type="number" id="id" required>
 
 <button type="submit">Delete</button>
 
 </form>
 
-<br>
+<script>
+fetch("/check-admin", {
+    credentials: "include"
+})
+.then(res=>res.json())
+.then(data=>{
+if(!data.is_admin){
+document.getElementById("msg").innerText = "You do NOT have delete access"
+document.querySelector("form").style.display = "none"
+}
+})
 
-<a href="/home">
-<button>Back to Home</button>
-</a>
+document.getElementById("deleteForm").addEventListener("submit", function(e){
 
-</div>
+e.preventDefault()
 
-</body>
-</html>
+let id = document.getElementById("id").value
+
+fetch(`/members/${id}`, {
+method:"DELETE", credentials: "include",
+})
+.then(res=>res.json())
+.then(data=>{
+if(data.message){
+window.location.href="/success"
+}else{
+alert(data.error)
+}
+})
+})
+</script>

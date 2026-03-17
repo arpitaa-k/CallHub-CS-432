@@ -24,9 +24,9 @@ password:password
 
 .then(data=>{
 
-if(data.success){
+if(data.message === "Login successful"){
 
-window.location.href="/dashboard"
+window.location.href="/home"
 
 }
 

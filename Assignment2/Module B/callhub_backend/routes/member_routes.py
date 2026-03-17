@@ -110,3 +110,31 @@ def search_member():
     results = cur.fetchall()
 
     return jsonify(results)
+
+
+@members.route("/members/<int:id>", methods=["PUT"])
+@login_required
+def update_member(id):
+
+    actor_id = session["member_id"]
+
+    if not is_admin(actor_id):
+        return {"error": "Admin privileges required"},403
+
+    data = request.json
+
+    name = data.get("full_name")
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        UPDATE Members
+        SET full_name=%s
+        WHERE member_id=%s
+    """,(name, id))
+
+    mysql.connection.commit()
+
+    log_action(actor_id, "Members", id, "UPDATE")
+
+    return {"message":"Member updated"}

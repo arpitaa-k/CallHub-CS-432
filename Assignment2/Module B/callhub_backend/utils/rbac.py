@@ -39,3 +39,18 @@ def is_admin(member_id):
     
 
     return False
+
+
+def can_edit_others(role):
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        SELECT can_edit_others
+        FROM Roles
+        WHERE role_title = %s
+    """, (role,))
+
+    result = cur.fetchone()
+
+    return result and result[0] == 1

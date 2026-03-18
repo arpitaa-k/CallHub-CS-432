@@ -5,7 +5,7 @@ from db import mysql
 from routes.auth_routes import auth
 from routes.member_routes import members
 from routes.portfolio_routes import portfolio
-from utils.rbac import is_admin
+from utils.rbac import can_edit_others
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
@@ -51,7 +51,7 @@ def create_page():
     if "member_id" not in session:
         return redirect("/")
 
-    if not is_admin(session["member_id"]):
+    if not can_edit_others(session.get("role")):
         return render_template("error.html")
 
     return render_template("create.html")
@@ -62,7 +62,7 @@ def update_page():
     if "member_id" not in session:
         return redirect("/")
 
-    if not is_admin(session["member_id"]):
+    if not can_edit_others(session.get("role")):
         return render_template("error.html")
 
     return render_template("update.html")
@@ -73,7 +73,7 @@ def delete_page():
     if "member_id" not in session:
         return redirect("/")
 
-    if not is_admin(session["member_id"]):
+    if not can_edit_others(session.get("role")):
         return render_template("error.html")
 
     return render_template("delete.html")

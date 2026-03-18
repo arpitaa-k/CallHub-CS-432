@@ -1,66 +1,227 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Read Members</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            padding: 8px;
+            margin: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
 
 <h2>Members List</h2>
 
-<input type="text" id="search" placeholder="Search by name">
-<button onclick="searchMember()">Search</button>
+<!-- 🔹 Search Section -->
+<div class="top-bar">
 
+    <!-- LEFT: Name Search -->
+    <div style="position: relative;">
+        <input type="text" id="search" placeholder="Enter name" oninput="onNameInput()">
+        <div id="suggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; display: none; z-index: 10;"></div>
+    </div>
+
+    <!-- RIGHT: Role Dropdown -->
+    <div>
+        <select id="role">
+            <option value="">Select Role</option>
+            <option>Director</option>
+            <option>Dean Academics</option>
+            <option>Dean Student Welfare</option>
+            <option>Registrar</option>
+            <option>HOD</option>
+            <option>Professor</option>
+            <option>Asst. Profesor</option>
+            <option>Student (UG)</option>
+            <option>Student (PG/PHD)</option>
+            <option>Warden</option>
+            <option>Security Guard</option>
+            <option>Medical Staff</option>
+        </select>
+
+        <button onclick="searchMember()">Search</button>
+    </div>
+
+</div>
+
+<!-- 🔹 Table -->
 <table border="1" id="membersTable">
+
 <tr>
-<th>ID</th>
-<th>Name</th>
-<th>Designation</th>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Designation</th>
+    <th>Search Frequency</th>
 </tr>
+
 </table>
 
+<!-- 🔹 Script -->
 <script>
 
-function loadMembers(){
-fetch("/check-admin", {
-    credentials: "include"
-})
-.then(res=>res.json())
-.then(data=>{
+let suggestionTimer;
 
-let table = document.getElementById("membersTable")
+function onNameInput() {
+    // Show suggestions as user types, but do NOT log these lookups.
+    clearTimeout(suggestionTimer);
 
-data.forEach(member=>{
-let row = table.insertRow()
+    const name = document.getElementById("search").value;
+    if (!name) {
+        clearSuggestions();
+        return;
+    }
 
-row.insertCell(0).innerText = member[0]
-row.insertCell(1).innerText = member[1]
-row.insertCell(2).innerText = member[2]
-})
-})
+    suggestionTimer = setTimeout(() => {
+        fetchMembers(false);
+    }, 250);
 }
 
-function searchMember(){
-
-let name = document.getElementById("search").value
-
-fetch(`/search?name=${name}`, {
-    credentials: "include"
-})
-.then(res=>res.json())
-.then(data=>{
-
-let table = document.getElementById("membersTable")
-table.innerHTML = `
-<tr>
-<th>ID</th>
-<th>Name</th>
-</tr>
-`
-
-data.forEach(member=>{
-let row = table.insertRow()
-
-row.insertCell(0).innerText = member[0]
-row.insertCell(1).innerText = member[1]
-})
-})
+function clearSuggestions() {
+    const suggestions = document.getElementById("suggestions");
+    suggestions.style.display = "none";
+    suggestions.innerHTML = "";
 }
 
-loadMembers()
+function setSuggestions(data) {
+    const suggestions = document.getElementById("suggestions");
+
+    if (!data || data.length === 0) {
+        clearSuggestions();
+        return;
+    }
+
+    suggestions.style.display = "block";
+    suggestions.innerHTML = data
+        .map(member => `
+            <div class="suggestion-item" data-name="${member.full_name}" style="padding: 8px; cursor: pointer; border-bottom: 1px solid #eee;">
+                <span>${member.full_name}</span>
+                <span style="float: right; color: #666;">${member.frequency}</span>
+            </div>
+        `)
+        .join("");
+
+    suggestions.querySelectorAll(".suggestion-item").forEach(el => {
+        el.addEventListener("click", () => {
+            document.getElementById("search").value = el.dataset.name;
+            clearSuggestions();
+            searchMember();
+        });
+    });
+}
+
+function updateTable(data) {
+    const table = document.getElementById("membersTable");
+
+    table.innerHTML = `
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Designation</th>
+            <th>Search Frequency</th>
+        </tr>
+    `;
+
+    if (!data || data.length === 0) {
+        table.innerHTML += `
+            <tr><td colspan="4">No members found</td></tr>
+        `;
+        return;
+    }
+
+    data.forEach(member => {
+        const row = table.insertRow();
+        row.insertCell(0).innerText = member.member_id;
+        row.insertCell(1).innerText = member.full_name;
+        row.insertCell(2).innerText = member.designation;
+        row.insertCell(3).innerText = member.frequency;
+    });
+}
+
+function fetchMembers(log = true) {
+    const name = document.getElementById("search").value;
+    const role = document.getElementById("role").value;
+
+    if (role === "") {
+        if (log) {
+            alert("Please select a role");
+        } else {
+            clearSuggestions();
+        }
+        return;
+    }
+
+    const url = `/search?name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&log=${log}`;
+
+    fetch(url, { credentials: "include" })
+        .then(res => {
+            // 🔴 Handle access denied
+            if (res.status === 403) {
+                document.getElementById("membersTable").innerHTML = `
+                    <tr><td colspan="4">Access Denied</td></tr>
+                `;
+                clearSuggestions();
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+
+            if (log) {
+                clearSuggestions();
+                updateTable(data);
+            } else {
+                setSuggestions(data);
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            alert("Error fetching data");
+        });
+}
+
+function searchMember() {
+    fetchMembers(true);
+}
+
+// Only trigger a search when the user presses Enter, not on every keystroke.
+document.getElementById("search").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        searchMember();
+    }
+});
+
+// Close suggestions if user clicks outside
+document.addEventListener("click", (event) => {
+    if (!event.target.closest("#suggestions") && event.target.id !== "search") {
+        clearSuggestions();
+    }
+});
 
 </script>
+
+</body>
+</html>

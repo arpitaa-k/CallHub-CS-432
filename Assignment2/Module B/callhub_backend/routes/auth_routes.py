@@ -31,6 +31,19 @@ def login():
         session["user_id"] = user_id
         session["member_id"] = member_id
 
+        # Fetch role
+        cur.execute("""
+            SELECT r.role_title
+            FROM Member_Role_Assignments mra
+            JOIN Roles r ON mra.role_id = r.role_id
+            WHERE mra.member_id = %s
+            LIMIT 1
+        """, (member_id,))
+
+        role = cur.fetchone()
+        if role:
+            session["role"] = role[0]
+
         return jsonify({
             "message":"Login successful",
             "member_id":member_id
@@ -46,9 +59,10 @@ def check_admin():
     if "member_id" not in session:
         return {"is_admin": False}
 
-    from utils.rbac import is_admin
+    from utils.rbac import can_edit_others
 
-    return {"is_admin": is_admin(session["member_id"])}
+    role = session.get("role")
+    return {"is_admin": can_edit_others(role)}
 
 @auth.route("/register", methods=["POST"])
 def register():

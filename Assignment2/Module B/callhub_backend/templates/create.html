@@ -1,39 +1,217 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Member</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        form { max-width: 600px; margin: auto; }
+        label { display: block; margin-top: 10px; }
+        input, select { width: 100%; padding: 8px; }
+        button { margin-top: 20px; padding: 10px; width: 100%; }
+        .role-selection { text-align: center; padding: 30px; }
+        .role-btn { margin: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
 
-<h2>Create Member</h2>
+<h2 id="pageTitle">Create Member</h2>
 
 <p id="msg"></p>
 
-<form id="createForm">
+<!-- Role Selection Screen -->
+<div id="roleSelectionDiv" class="role-selection">
+    <h3>Select Role to Create</h3>
+    <div id="roleButtons"></div>
+</div>
 
-<label>Name</label>
-<input type="text" id="name" required>
+<!-- Main Form (hidden until role is selected) -->
+<form id="createForm" style="display: none;">
 
-<label>Age</label>
-<input type="number" id="age" required>
+    <h3>Department</h3>
+    <label>Department</label>
+    <select id="dept_id" required>
+        <option value="">Select Department</option>
+    </select>
 
-<label>Dept ID</label>
-<input type="number" id="dept" required>
+    <h3>Category</h3>
+    <label>Category Name</label>
+    <select id="category_name" required>
+        <option value="">Select Category</option>
+        <option>Public</option>
+        <option>Residential</option>
+        <option>Academic</option>
+        <option>Confidential</option>
+        <option>Emergency</option>
+    </select>
 
-<button type="submit">Create</button>
+    <h3>Role</h3>
+    <label>Role Title</label>
+    <select id="role_title" required disabled>
+        <option id="selectedRole" value=""></option>
+    </select>
+
+    <h3>Member Details</h3>
+    <label>Full Name</label>
+    <input type="text" id="full_name" required>
+
+    <label>Designation</label>
+    <input type="text" id="designation" required>
+
+    <label>Age</label>
+    <input type="number" id="age" required>
+
+    <label>Gender</label>
+    <select id="gender" required>
+        <option value="">Select Gender</option>
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+        <option value="O">Other</option>
+    </select>
+
+    <label>Join Date</label>
+    <input type="date" id="join_date" required>
+
+    <h3>Contact</h3>
+    <label>Assign Date (optional)</label>
+    <input type="date" id="assign_date">
+
+    <label>Contact Type</label>
+    <select id="contact_type" required>
+        <option value="">Select Type</option>
+        <option value="Mobile">Mobile</option>
+        <option value="Personal Email">Personal Email</option>
+        <option value="Landline">Landline</option>
+        <option value="Official Email">Official Email</option>
+    </select>
+
+    <label>Contact Value</label>
+    <input type="text" id="contact_value" required>
+
+    <h3>Location</h3>
+    <label>Location Type</label>
+    <select id="location_type" required>
+        <option value="">Select Type</option>
+        <option>Office</option>
+        <option>Hostel Room</option>
+        <option>Lab</option>
+        <option>Residence</option>
+        <option>Post</option>
+    </select>
+
+    <label>Building Name</label>
+    <input type="text" id="building_name" required>
+
+    <label>Room Number</label>
+    <input type="text" id="room_number" required>
+
+    <h3>Emergency Contact</h3>
+    <label>Person Name</label>
+    <input type="text" id="emergency_name" required>
+
+    <label>Relation</label>
+    <input type="text" id="relation" required>
+
+    <label>Contact Number</label>
+    <input type="text" id="emergency_contact" required>
+
+    <h3>Credentials</h3>
+    <label>Username</label>
+    <input type="text" id="username" required>
+
+    <label>Password</label>
+    <input type="password" id="password" required>
+
+    <button type="submit">Create Member</button>
+    <button type="button" onclick="backToRoles()">Back</button>
 
 </form>
 
 <script>
-fetch("/check-admin", {
-    credentials: "include"
-})
+
+function backToRoles() {
+    document.getElementById("roleSelectionDiv").style.display = "block";
+    document.getElementById("createForm").style.display = "none";
+}
+
+// Fetch editable roles
+fetch("/editable-roles", { credentials: "include" })
 .then(res=>res.json())
 .then(data=>{
-if(!data.is_admin){
-document.getElementById("msg").innerText = "You do NOT have edit access"
-document.querySelector("form").style.display = "none"
-}
+    const roleDiv = document.getElementById("roleButtons");
+    roleDiv.innerHTML = "";
+    
+    if (!data || data.length === 0) {
+        document.getElementById("msg").innerText = "You do NOT have access to create members";
+        document.getElementById("roleSelectionDiv").style.display = "none";
+        return;
+    }
+    
+    data.forEach(role => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "role-btn";
+        btn.innerText = role.role_title;
+        btn.onclick = () => selectRole(role.role_title);
+        roleDiv.appendChild(btn);
+    });
 })
+
+function selectRole(roleTitle) {
+    document.getElementById("role_title").value = roleTitle;
+    document.getElementById("selectedRole").value = roleTitle;
+    document.getElementById("selectedRole").text = roleTitle;
+    
+    // Load departments
+    fetch("/members", { credentials: "include" })
+    .then(res => res.json())
+    .then(data => {
+        // Extract unique departments from all members
+        const depts = {};
+        data.forEach(member => {
+            if (member.dept_id && member.dept_name) {
+                depts[member.dept_id] = member.dept_name;
+            }
+        });
+        
+        const deptSelect = document.getElementById("dept_id");
+        deptSelect.innerHTML = '<option value="">Select Department</option>';
+        Object.entries(depts).forEach(([id, name]) => {
+            const opt = document.createElement("option");
+            opt.value = id;
+            opt.text = name;
+            deptSelect.appendChild(opt);
+        });
+    })
+    
+    document.getElementById("roleSelectionDiv").style.display = "none";
+    document.getElementById("createForm").style.display = "block";
+}
 
 document.getElementById("createForm").addEventListener("submit", function(e){
 
 e.preventDefault()
+
+const formData = {
+    dept_id: document.getElementById("dept_id").value,
+    category_name: document.getElementById("category_name").value,
+    role_title: document.getElementById("role_title").value,
+    full_name: document.getElementById("full_name").value,
+    designation: document.getElementById("designation").value,
+    age: document.getElementById("age").value,
+    gender: document.getElementById("gender").value,
+    join_date: document.getElementById("join_date").value,
+    assign_date: document.getElementById("assign_date").value || null,
+    contact_type: document.getElementById("contact_type").value,
+    contact_value: document.getElementById("contact_value").value,
+    location_type: document.getElementById("location_type").value,
+    building_name: document.getElementById("building_name").value,
+    room_number: document.getElementById("room_number").value,
+    emergency_name: document.getElementById("emergency_name").value,
+    relation: document.getElementById("relation").value,
+    emergency_contact: document.getElementById("emergency_contact").value,
+    username: document.getElementById("username").value,
+    password: document.getElementById("password").value
+}
 
 fetch("/members", {
 method:"POST",
@@ -41,11 +219,7 @@ credentials: "include",
 headers:{
 "Content-Type":"application/json"
 },
-body:JSON.stringify({
-full_name: document.getElementById("name").value,
-age: document.getElementById("age").value,
-dept_id: document.getElementById("dept").value
-})
+body:JSON.stringify(formData)
 })
 .then(res=>res.json())
 .then(data=>{
@@ -57,3 +231,7 @@ alert(data.error)
 })
 })
 </script>
+
+</body>
+</html>
+

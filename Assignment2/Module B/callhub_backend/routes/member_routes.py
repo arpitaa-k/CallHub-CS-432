@@ -106,8 +106,8 @@ def create_member():
 
     data = request.json
 
-    # Department (for new member only)
-    dept_id = data.get("dept_id")
+    # Department (for new member only) - removed from UI; default to 1 if not provided
+    dept_id = data.get("dept_id") or 1
 
     # Category
     category_name = data.get("category_name")
@@ -121,6 +121,7 @@ def create_member():
     age = data.get("age")
     gender = data.get("gender")
     join_date = data.get("join_date")
+    assign_date = data.get("assign_date")
 
     # Contact
     contact_type = data.get("contact_type")
@@ -143,12 +144,6 @@ def create_member():
     cur = mysql.connection.cursor()
 
     try:
-        # Insert Department if not exists
-        cur.execute("""
-            INSERT IGNORE INTO Departments (dept_id, dept_code, dept_name, building_location)
-            VALUES (%s, %s, %s, %s)
-        """, (dept_id, dept_code, dept_name, building_location))
-
         # Get category_id
         cur.execute("SELECT category_id FROM Data_Categories WHERE category_name = %s", (category_name,))
         category = cur.fetchone()
@@ -196,11 +191,17 @@ def create_member():
             VALUES (%s, %s, %s)
         """, (new_member_id, username, hashed.decode()))
 
-        # Insert Member_Role_Assignments
-        cur.execute("""
-            INSERT INTO Member_Role_Assignments (member_id, role_id)
-            VALUES (%s, %s)
-        """, (new_member_id, role_id))
+        # Insert Member_Role_Assignments (include assigned_date if provided)
+        if assign_date:
+            cur.execute("""
+                INSERT INTO Member_Role_Assignments (member_id, role_id, assigned_date)
+                VALUES (%s, %s, %s)
+            """, (new_member_id, role_id, assign_date))
+        else:
+            cur.execute("""
+                INSERT INTO Member_Role_Assignments (member_id, role_id)
+                VALUES (%s, %s)
+            """, (new_member_id, role_id))
 
         mysql.connection.commit()
 
@@ -456,11 +457,16 @@ def update_member(id):
                 UPDATE User_Credentials SET username=%s, password_hash=%s WHERE member_id=%s
             """, (username, hashed.decode(), id))
 
-        # Update Member_Role_Assignments
+        # Update Member_Role_Assignments (also update assigned_date when provided)
         if role_id:
-            cur.execute("""
-                UPDATE Member_Role_Assignments SET role_id=%s WHERE member_id=%s
-            """, (role_id, id))
+            if assign_date:
+                cur.execute("""
+                    UPDATE Member_Role_Assignments SET role_id=%s, assigned_date=%s WHERE member_id=%s
+                """, (role_id, assign_date, id))
+            else:
+                cur.execute("""
+                    UPDATE Member_Role_Assignments SET role_id=%s WHERE member_id=%s
+                """, (role_id, id))
 
         mysql.connection.commit()
 

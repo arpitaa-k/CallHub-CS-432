@@ -27,11 +27,7 @@
 <!-- Main Form (hidden until role is selected) -->
 <form id="createForm" style="display: none;">
 
-    <h3>Department</h3>
-    <label>Department</label>
-    <select id="dept_id" required>
-        <option value="">Select Department</option>
-    </select>
+    <!-- Department removed -->
 
     <h3>Category</h3>
     <label>Category Name</label>
@@ -46,9 +42,8 @@
 
     <h3>Role</h3>
     <label>Role Title</label>
-    <select id="role_title" required disabled>
-        <option id="selectedRole" value=""></option>
-    </select>
+    <div id="role_display" style="padding:8px;border:1px solid #ccc;background:#f9f9f9;min-height:36px"></div>
+    <input type="hidden" id="role_title" value="" />
 
     <h3>Member Details</h3>
     <label>Full Name</label>
@@ -157,31 +152,11 @@ fetch("/editable-roles", { credentials: "include" })
 })
 
 function selectRole(roleTitle) {
+    // set hidden input and visible read-only display
     document.getElementById("role_title").value = roleTitle;
-    document.getElementById("selectedRole").value = roleTitle;
-    document.getElementById("selectedRole").text = roleTitle;
+    document.getElementById("role_display").innerText = roleTitle;
     
-    // Load departments
-    fetch("/members", { credentials: "include" })
-    .then(res => res.json())
-    .then(data => {
-        // Extract unique departments from all members
-        const depts = {};
-        data.forEach(member => {
-            if (member.dept_id && member.dept_name) {
-                depts[member.dept_id] = member.dept_name;
-            }
-        });
-        
-        const deptSelect = document.getElementById("dept_id");
-        deptSelect.innerHTML = '<option value="">Select Department</option>';
-        Object.entries(depts).forEach(([id, name]) => {
-            const opt = document.createElement("option");
-            opt.value = id;
-            opt.text = name;
-            deptSelect.appendChild(opt);
-        });
-    })
+    // Department removed; no department list to load
     
     document.getElementById("roleSelectionDiv").style.display = "none";
     document.getElementById("createForm").style.display = "block";
@@ -192,7 +167,6 @@ document.getElementById("createForm").addEventListener("submit", function(e){
 e.preventDefault()
 
 const formData = {
-    dept_id: document.getElementById("dept_id").value,
     category_name: document.getElementById("category_name").value,
     role_title: document.getElementById("role_title").value,
     full_name: document.getElementById("full_name").value,

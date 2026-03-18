@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from db import mysql
+from MySQLdb import IntegrityError
 import bcrypt
 
 auth = Blueprint("auth", __name__)
@@ -71,21 +72,34 @@ def register():
 
     username = data["username"]
     password = data["password"]
-    member_id = data["member_id"]
+    member_id = data.get("member_id")
 
     hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
     cur = mysql.connection.cursor()
 
-    cur.execute("""
-        INSERT INTO User_Credentials
-        (member_id, username, password_hash)
-        VALUES (%s,%s,%s)
-    """,(member_id, username, hashed.decode()))
+    # Check username uniqueness
+    cur.execute("SELECT 1 FROM User_Credentials WHERE username=%s", (username,))
+    if cur.fetchone():
+        return jsonify({"error": "username already registered"}), 409
 
-    mysql.connection.commit()
+    # If client provided member_id, ensure it's not already used
+    if member_id is not None:
+        cur.execute("SELECT 1 FROM User_Credentials WHERE member_id=%s", (member_id,))
+        if cur.fetchone():
+            return jsonify({"error": "member_id already registered"}), 409
 
-    return {"message":"User registered"}
+    try:
+        cur.execute("""
+            INSERT INTO User_Credentials
+            (member_id, username, password_hash)
+            VALUES (%s,%s,%s)
+        """, (member_id, username, hashed.decode()))
+        mysql.connection.commit()
+    except IntegrityError:
+        return jsonify({"error": "duplicate member_id or constraint violation"}), 409
+
+    return jsonify({"message": "User registered"})
 
 
 @auth.route("/logout")

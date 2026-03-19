@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session, redirect
 from db import mysql
 from MySQLdb import IntegrityError
 import bcrypt
@@ -7,6 +7,9 @@ auth = Blueprint("auth", __name__)
 
 @auth.route("/login", methods=["POST"])
 def login():
+
+    # Clear any existing session
+    session.clear()
 
     data = request.json
     username = data["username"]
@@ -27,8 +30,9 @@ def login():
 
     user_id, member_id, password_hash = user
 
-    if bcrypt.checkpw(password.encode(), password_hash.encode()):
 
+    if bcrypt.checkpw(password.encode(), password_hash.encode()):
+        session.permanent = True
         session["user_id"] = user_id
         session["member_id"] = member_id
 
@@ -107,4 +111,4 @@ def logout():
 
     session.clear()
 
-    return {"message":"logged out"}
+    return redirect("/")

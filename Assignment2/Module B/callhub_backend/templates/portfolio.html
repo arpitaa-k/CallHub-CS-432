@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Portfolio</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="home-page">
+<header class="header">
+<div class="logo">
+<img src="https://labs.iitgn.ac.in/muselaboratory/wp-content/uploads/2020/10/iitgnlogo-emblem.png" height="60">
+<span>IITGN Dictionary</span>
+</div>
+<div class="user">
+Welcome {{member_id}}
+<a href="/logout" class="logout-btn">Logout</a>
+</div>
+</header>
+<div class="content">
+<h2>My Portfolio</h2>
+<div id="portfolio-data">
+<!-- Portfolio data will be loaded here -->
+</div>
+</div>
+<footer class="footer">
+<div class="crud-box">
+<a href="/home">Home</a>
+</div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/member/{{member_id}}/portfolio')
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            document.getElementById('portfolio-data').innerHTML = '<p>' + data.error + '</p>';
+            return;
+        }
+        let html = '<h3>Member Info</h3>';
+        if (data.member) {
+            html += '<p>Name: ' + data.member[0] + '</p>';
+            html += '<p>Designation: ' + data.member[1] + '</p>';
+        }
+        html += '<h3>Contacts</h3><ul>';
+        data.contacts.forEach(c => {
+            html += '<li>' + c[0] + ': ' + c[1] + '</li>';
+        });
+        html += '</ul>';
+        html += '<h3>Locations</h3><ul>';
+        data.locations.forEach(l => {
+            html += '<li>' + l[0] + ': ' + l[1] + ' ' + l[2] + '</li>';
+        });
+        html += '</ul>';
+        html += '<h3>Emergency Contacts</h3><ul>';
+        data.emergency_contacts.forEach(e => {
+            html += '<li>' + e[0] + ' (' + e[1] + '): ' + e[2] + '</li>';
+        });
+        html += '</ul>';
+        document.getElementById('portfolio-data').innerHTML = html;
+    })
+    .catch(err => {
+        document.getElementById('portfolio-data').innerHTML = '<p>Error loading portfolio</p>';
+    });
+});
+</script>
+</body>
+</html>

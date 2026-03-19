@@ -7,7 +7,11 @@ from routes.member_routes import members
 from routes.portfolio_routes import portfolio
 from utils.rbac import can_edit_others
 
+
+from datetime import timedelta
+
 app = Flask(__name__, template_folder="templates", static_folder="static")
+app.permanent_session_lifetime = timedelta(seconds=30)  # 30 seconds for demo; set to 900 for 15 min
 
 # DB config
 app.config['MYSQL_HOST'] = MYSQL_HOST
@@ -23,20 +27,36 @@ app.register_blueprint(auth)
 app.register_blueprint(members)
 app.register_blueprint(portfolio)
 
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 # ------------------------
 # FRONTEND ROUTES
 # ------------------------
 
 @app.route("/")
 def login_page():
+    if "member_id" in session:
+        return redirect("/home")
     return render_template("Login.html")
+
 
 
 @app.route("/home")
 def home():
     if "member_id" not in session:
         return redirect("/")
-    return render_template("Homepage.html", username=session.get("member_id"))
+    member_id = session.get("member_id")
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT full_name, designation FROM Members WHERE member_id=%s", (member_id,))
+    member = cur.fetchone()
+    name = member[0] if member else "User"
+    role = member[1] if member else "Member"
+    return render_template("Homepage.html", username=member_id, name=name, role=role)
 
 
 @app.route("/read")
@@ -84,9 +104,11 @@ def success():
     return render_template("success.html")
 
 
-@app.route("/error")
-def error():
-    return render_template("error.html")
+@app.route("/portfolio")
+def portfolio_page():
+    if "member_id" not in session:
+        return redirect("/")
+    return render_template("portfolio.html", member_id=session.get("member_id"))
 
 
 if __name__ == "__main__":

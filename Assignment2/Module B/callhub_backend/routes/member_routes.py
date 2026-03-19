@@ -57,26 +57,36 @@ def get_editable_roles():
 @login_required
 def get_members():
 
-    role = request.args.get("role", "")
+    actor_id = session["member_id"]
+    user_role = session.get("role")
+
+    role_filter = request.args.get("role", "")
 
     cur = mysql.connection.cursor()
 
-    if role:
-        # Get members with specific role
-        cur.execute("""
-            SELECT m.member_id, m.full_name, m.designation
-            FROM Members m
-            JOIN Member_Role_Assignments mra ON m.member_id = mra.member_id
-            JOIN Roles r ON mra.role_id = r.role_id
-            WHERE r.role_title = %s AND m.is_deleted = 0
-        """, (role,))
+    if can_edit_others(user_role):
+        # Admin: can see all
+        if role_filter:
+            cur.execute("""
+                SELECT m.member_id, m.full_name, m.designation
+                FROM Members m
+                JOIN Member_Role_Assignments mra ON m.member_id = mra.member_id
+                JOIN Roles r ON mra.role_id = r.role_id
+                WHERE r.role_title = %s AND m.is_deleted = 0
+            """, (role_filter,))
+        else:
+            cur.execute("""
+                SELECT member_id, full_name, designation
+                FROM Members
+                WHERE is_deleted = 0
+            """)
     else:
-        # Get all members
+        # Regular user: only own
         cur.execute("""
             SELECT member_id, full_name, designation
             FROM Members
-            WHERE is_deleted = 0
-        """)
+            WHERE member_id = %s AND is_deleted = 0
+        """, (actor_id,))
 
     data = cur.fetchall()
 
@@ -221,6 +231,12 @@ def create_member():
 @members.route("/members/<int:id>", methods=["GET"])
 @login_required
 def get_member(id):
+    actor_id = session["member_id"]
+    user_role = session.get("role")
+
+    if not can_edit_others(user_role) and actor_id != id:
+        return {"error": "Access denied"}, 403
+
     try:
         cur = mysql.connection.cursor()
 

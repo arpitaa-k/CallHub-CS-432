@@ -1,3 +1,164 @@
+/* Profile and Home Redesign */
+.profile-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.profile-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.profile-name {
+    font-weight: bold;
+    font-size: 16px;
+    color: #fff;
+}
+.logout-btn-red {
+    background: #e53935;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 18px;
+    font-size: 15px;
+    margin-top: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+.logout-btn-red:hover {
+    background: #b71c1c;
+}
+
+.home-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 80vh;
+}
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 32px 0 24px 0;
+    color: #222;
+    text-align: center;
+}
+.portfolio-card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding: 24px 36px;
+    margin-bottom: 32px;
+    gap: 24px;
+    min-width: 340px;
+}
+.portfolio-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.portfolio-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.portfolio-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #222;
+}
+.portfolio-role {
+    font-size: 1rem;
+    color: #666;
+}
+.portfolio-id {
+    font-size: 0.95rem;
+    color: #888;
+}
+.action-buttons {
+    display: flex;
+    gap: 18px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.action-btn {
+    background: #ff6b35;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.2s;
+    margin-bottom: 8px;
+}
+.action-btn.main {
+    background: #2e7d32;
+}
+.action-btn:hover {
+    background: #e85c2c;
+}
+/* MODAL DIALOG */
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: #fff;
+    padding: 32px 32px 24px 32px;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    min-width: 320px;
+    text-align: center;
+}
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 24px;
+    display: block;
+}
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.modal-btn {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.modal-btn.confirm {
+    background: #ff6b35;
+    color: #fff;
+}
+.modal-btn.cancel {
+    background: #eee;
+    color: #333;
+}
 /* LOGIN PAGE BACKGROUND */
 
 .login-page{

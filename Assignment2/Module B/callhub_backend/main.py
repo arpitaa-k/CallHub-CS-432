@@ -8,10 +8,34 @@ from routes.portfolio_routes import portfolio
 from utils.rbac import can_edit_others
 
 
-from datetime import timedelta
+from datetime import timedelta, datetime
+import os
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
-app.permanent_session_lifetime = timedelta(seconds=30)  # 30 seconds for demo; set to 900 for 15 min
+# Set session lifetime to 30 minutes of inactivity
+app.permanent_session_lifetime = timedelta(minutes=30)
+
+
+# Inactivity handling: we store `last_active` timestamp in session (UTC seconds).
+# If the user is inactive for longer than `permanent_session_lifetime`, we'll clear the session.
+@app.before_request
+def refresh_session_activity():
+    try:
+        if 'member_id' in session:
+            now = int(datetime.utcnow().timestamp())
+            last = session.get('last_active')
+            timeout = int(app.permanent_session_lifetime.total_seconds())
+            if last is not None:
+                # expired -> clear session
+                if now - int(last) > timeout:
+                    session.clear()
+                    return redirect('/')
+            # update last active on each request
+            session['last_active'] = now
+            session.modified = True
+    except Exception:
+        # be tolerant to any session read/write errors
+        pass
 
 # DB config
 app.config['MYSQL_HOST'] = MYSQL_HOST
@@ -20,7 +44,7 @@ app.config['MYSQL_PASSWORD'] = MYSQL_PASSWORD
 app.config['MYSQL_DB'] = MYSQL_DB
 
 mysql.init_app(app)
-app.secret_key = "supersecret"
+app.secret_key = os.getenv('FLASK_SECRET', 'supersecret')
 
 # Blueprints
 app.register_blueprint(auth)

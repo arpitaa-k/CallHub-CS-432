@@ -1,0 +1,148 @@
+[
+  {
+    "desc": "Portfolio: Get member info",
+    "query": "SELECT member_id, full_name, designation, age, gender, dept_id, join_date, is_active FROM Members WHERE member_id = 1 AND is_deleted = 0",
+    "explain": [
+      [
+        1,
+        "SIMPLE",
+        "Members",
+        null,
+        "const",
+        "PRIMARY",
+        "PRIMARY",
+        "4",
+        "const",
+        1,
+        100.0,
+        null
+      ]
+    ],
+    "execution_time": 0.0,
+    "rows": 1
+  },
+  {
+    "desc": "Portfolio: Get allowed categories",
+    "query": "SELECT DISTINCT rp.category_id FROM Member_Role_Assignments mra JOIN Role_Permissions rp ON mra.role_id = rp.role_id WHERE mra.member_id = 1 AND rp.can_view = 1",
+    "explain": [
+      [
+        1,
+        "SIMPLE",
+        "mra",
+        null,
+        "ref",
+        "member_id,role_id",
+        "member_id",
+        "4",
+        "const",
+        1,
+        100.0,
+        "Using temporary"
+      ],
+      [
+        1,
+        "SIMPLE",
+        "rp",
+        null,
+        "ref",
+        "role_id,category_id",
+        "role_id",
+        "5",
+        "callhub_db.mra.role_id",
+        5,
+        10.0,
+        "Using where"
+      ]
+    ],
+    "execution_time": 0.0,
+    "rows": 5
+  },
+  {
+    "desc": "Members: Check edit permission",
+    "query": "SELECT can_edit_others FROM Roles WHERE role_title = 'Professor'",
+    "explain": [
+      [
+        1,
+        "SIMPLE",
+        "Roles",
+        null,
+        "const",
+        "role_title",
+        "role_title",
+        "202",
+        "const",
+        1,
+        100.0,
+        null
+      ]
+    ],
+    "execution_time": 0.0,
+    "rows": 1
+  },
+  {
+    "desc": "Members: Get editable roles",
+    "query": "SELECT role_id, role_title FROM Roles ORDER BY role_title",
+    "explain": [
+      [
+        1,
+        "SIMPLE",
+        "Roles",
+        null,
+        "index",
+        null,
+        "role_title",
+        "202",
+        null,
+        12,
+        100.0,
+        "Using index"
+      ]
+    ],
+    "execution_time": 0.00829005241394043,
+    "rows": 12
+  },
+  {
+    "desc": "Members: Search by name",
+    "query": "SELECT * FROM Members WHERE full_name LIKE '%John%'",
+    "explain": [
+      [
+        1,
+        "SIMPLE",
+        "Members",
+        null,
+        "ALL",
+        null,
+        null,
+        null,
+        null,
+        4870,
+        11.11,
+        "Using where"
+      ]
+    ],
+    "execution_time": 0.015074968338012695,
+    "rows": 154
+  },
+  {
+    "desc": "Members: Filter by designation",
+    "query": "SELECT * FROM Members WHERE designation = 'Registrar'",
+    "explain": [
+      [
+        1,
+        "SIMPLE",
+        "Members",
+        null,
+        "ALL",
+        null,
+        null,
+        null,
+        null,
+        4870,
+        10.0,
+        "Using where"
+      ]
+    ],
+    "execution_time": 0.013275623321533203,
+    "rows": 1
+  }
+]

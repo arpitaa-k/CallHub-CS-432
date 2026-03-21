@@ -112,3 +112,18 @@ def logout():
     session.clear()
 
     return redirect("/")
+
+
+@auth.route('/keepalive', methods=['POST'])
+def keepalive():
+    """Endpoint the frontend can POST to when the user is active on the page.
+
+    It refreshes the server-side `last_active` timestamp so the user is not logged out
+    while interacting with the page.
+    """
+    if 'member_id' not in session:
+        return jsonify({'error': 'not authenticated'}), 401
+    from datetime import datetime
+    session['last_active'] = int(datetime.utcnow().timestamp())
+    session.modified = True
+    return jsonify({'ok': True})

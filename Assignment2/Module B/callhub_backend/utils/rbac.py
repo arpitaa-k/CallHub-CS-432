@@ -19,24 +19,21 @@ def has_permission(member_id, category_id):
 
 
 def is_admin(member_id):
-
     cur = mysql.connection.cursor()
 
+    # Check whether any of the member's assigned roles has can_edit_others flag set
     cur.execute("""
-        SELECT r.role_title
+        SELECT r.can_edit_others
         FROM Member_Role_Assignments mra
         JOIN Roles r ON mra.role_id = r.role_id
         WHERE mra.member_id = %s
-    """,(member_id,))
+    """, (member_id,))
 
-    roles = cur.fetchall()
+    rows = cur.fetchall()
 
-    admin_roles = ["admin", "director", "dean academics", "registrar"]
-    print("ROLES FROM DB:", roles)
-    for role in roles:
-        if role[0].lower() in admin_roles:
+    for row in rows:
+        if row and row[0] == 1:
             return True
-    
 
     return False
 

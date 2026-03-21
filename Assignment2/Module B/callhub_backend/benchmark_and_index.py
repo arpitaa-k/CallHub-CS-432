@@ -6,6 +6,7 @@ import requests
 from faker import Faker
 from dotenv import load_dotenv
 import mysql.connector  # Use psycopg2 for PostgreSQL
+from datetime import datetime
 
 # --- Load .env ---
 load_dotenv()
@@ -200,9 +201,11 @@ def generate_all_data():
     print("Data generation complete.")
 
 def time_api_endpoints():
+    # Keep a minimal and correct set of endpoints for timing. Remove endpoints that are not necessary.
     endpoints = [
-        "/members", "/members/1", "/portfolio/1", "/login"
-        # Add all your endpoints here
+        "/members",
+        "/members/1",
+        "/member/1/portfolio"
     ]
     print("\n--- API Response Times ---")
     times = []
@@ -219,7 +222,45 @@ def time_api_endpoints():
             times.append((ep, float('inf')))
     slowest = max(times, key=lambda x: x[1])
     print(f"\nSlowest endpoint: {slowest[0]} ({slowest[1]:.3f}s)")
-    return times
+
+    api_results = [{'endpoint': ep, 'time': t} for ep, t in times]
+    return api_results
+
+
+def _write_json(path, obj):
+    import json
+    try:
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(obj, f, indent=2, default=str)
+    except Exception as e:
+        print('Failed to write', path, e)
+
+
+def _ensure_bench_dir():
+    d = os.path.join(os.path.dirname(__file__), '..', 'benchmarks')
+    d = os.path.abspath(d)
+    os.makedirs(d, exist_ok=True)
+    return d
+
+
+def save_snapshot(tag, api_times, profile_results):
+    """Save timestamped snapshot files for API timings and profile results.
+
+    Writes files to `benchmarks/` named with the tag and timestamp and also writes
+    a '_latest' file for convenience.
+    """
+    ts = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+    d = _ensure_bench_dir()
+    api_fname = f'callhub_api_times_{tag}_{ts}.json'
+    profile_fname = f'callhub_benchmark_profile_{tag}_{ts}.json'
+    api_path = os.path.join(d, api_fname)
+    profile_path = os.path.join(d, profile_fname)
+    _write_json(api_path, api_times)
+    _write_json(profile_path, profile_results)
+
+    # Also write latest copies at repo root for backward compatibility
+    _write_json('callhub_api_times_latest.json', api_times)
+    _write_json('callhub_benchmark_profile_latest.json', profile_results)
 
 def profile_queries():
     conn = get_connection()
@@ -234,28 +275,49 @@ def profile_queries():
         ("SELECT * FROM Members WHERE designation = 'Registrar'", "Members: Filter by designation"),
     ]
     print("\n--- SQL Query Profiling (EXPLAIN and Execution Time) ---")
+    results = []
     for query, desc in queries:
         print(f"\nQuery ({desc}): {query}")
         # EXPLAIN
-        cur.execute(f"EXPLAIN {query}")
-        explain_rows = cur.fetchall()
+        try:
+            cur.execute(f"EXPLAIN {query}")
+            explain_rows = cur.fetchall()
+        except Exception as e:
+            explain_rows = [str(e)]
+
         for row in explain_rows:
             print(row)
+
         # Execution time
         start = time.time()
-        cur.execute(query)
-        results = cur.fetchall()
+        try:
+            cur.execute(query)
+            query_results = cur.fetchall()
+        except Exception as e:
+            query_results = []
+            print('Query failed:', e)
         elapsed = time.time() - start
-        print(f"Execution Time: {elapsed:.4f}s (Rows returned: {len(results)})")
+        print(f"Execution Time: {elapsed:.4f}s (Rows returned: {len(query_results)})")
+        results.append({
+            'desc': desc,
+            'query': query,
+            'explain': explain_rows,
+            'execution_time': elapsed,
+            'rows': len(query_results)
+        })
+
     cur.close()
     conn.close()
+
+    return results
 
 def apply_indexes():
     conn = get_connection()
     cur = conn.cursor()
     print("\n--- Applying Indexes ---")
+    # Avoid re-indexing primary key columns. Add composite indexes to support queries with multiple WHERE filters.
     index_queries = [
-        "CREATE INDEX idx_members_member_id ON Members(member_id)",
+        # single-column useful indexes
         "CREATE INDEX idx_members_full_name ON Members(full_name)",
         "CREATE INDEX idx_members_designation ON Members(designation)",
         "CREATE INDEX idx_members_is_deleted ON Members(is_deleted)",
@@ -263,35 +325,58 @@ def apply_indexes():
         "CREATE INDEX idx_mra_member_id ON Member_Role_Assignments(member_id)",
         "CREATE INDEX idx_rp_role_id ON Role_Permissions(role_id)",
         "CREATE INDEX idx_rp_category_id ON Role_Permissions(category_id)",
+        # composite indexes to help multi-column filters
+        "CREATE INDEX idx_members_isdeleted_fullname ON Members(is_deleted, full_name)",
+        "CREATE INDEX idx_members_designation_isdeleted ON Members(designation, is_deleted)",
     ]
     for index_sql in index_queries:
         try:
             cur.execute(index_sql)
             print(f"Created: {index_sql}")
-        except mysql.connector.errors.ProgrammingError as e:
-            if "Duplicate key name" not in str(e):
-                raise
+        except mysql.connector.Error as e:
+            # MySQL raises error when index already exists (errno 1061 or duplicate-key messages).
+            # Skip duplicate-index errors, re-raise others.
+            err_no = getattr(e, 'errno', None)
+            msg = str(e)
+            if err_no in (1061,) or 'Duplicate key name' in msg or 'already exists' in msg:
+                print(f"Index already exists or skipped: {index_sql}")
             else:
-                print(f"Index already exists: {index_sql}")
+                raise
     conn.commit()
     cur.close()
     conn.close()
     print("Indexes applied.")
 
+
+# Audit/trigger setup moved to `setup_audit_triggers.py` to keep this script focused
+# on benchmarking and indexing. If you want to create the `source` column and
+# the DB triggers, run `python setup_audit_triggers.py` from `callhub_backend`.
+
 def main():
+    # 0. Ensure audit column & triggers to detect direct DB changes
+    ensure_audit_column_and_triggers()
+
     # 1. Generate random data
     generate_all_data()
 
     # 2. Record API response times and profile queries BEFORE indexing
-    time_api_endpoints()
-    profile_queries()
+    print('\n--- Running benchmarks BEFORE indexing ---')
+    api_before = time_api_endpoints()
+    profile_before = profile_queries()
+
+    # persist BEFORE snapshot
+    save_snapshot('before', api_before, profile_before)
 
     # 3. Apply indexes
     apply_indexes()
 
     # 4. Record API response times and profile queries AFTER indexing
-    time_api_endpoints()
-    profile_queries()
+    print('\n--- Running benchmarks AFTER indexing ---')
+    api_after = time_api_endpoints()
+    profile_after = profile_queries()
+
+    # persist AFTER snapshot
+    save_snapshot('after', api_after, profile_after)
 
 if __name__ == "__main__":
     main()

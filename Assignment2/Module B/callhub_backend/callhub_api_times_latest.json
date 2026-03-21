@@ -1,0 +1,14 @@
+[
+  {
+    "endpoint": "/members",
+    "time": 2.0296504497528076
+  },
+  {
+    "endpoint": "/members/1",
+    "time": 2.0348360538482666
+  },
+  {
+    "endpoint": "/member/1/portfolio",
+    "time": 2.033313035964966
+  }
+]

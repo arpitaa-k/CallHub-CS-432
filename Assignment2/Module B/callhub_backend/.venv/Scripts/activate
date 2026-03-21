@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="D:\College\Semester 5\CallHub-CS-432\Assignment2\Module B\callhub_backend\.venv"
+VIRTUAL_ENV="D:\sia_db\CallHub-CS-432\Assignment2\Module B\callhub_backend\.venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

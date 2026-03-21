@@ -78,6 +78,8 @@
 
 </table>
 
+<div id="portfolio-details" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px; display:none;"></div>
+
 <!-- 🔹 Script -->
 <script>
 
@@ -139,7 +141,7 @@ function updateTable(data) {
             <th>ID</th>
             <th>Name</th>
             <th>Designation</th>
-            <th>Search Frequency</th>
+            <th>Portfolio</th>
         </tr>
     `;
 
@@ -155,8 +157,70 @@ function updateTable(data) {
         row.insertCell(0).innerText = member.member_id;
         row.insertCell(1).innerText = member.full_name;
         row.insertCell(2).innerText = member.designation;
-        row.insertCell(3).innerText = member.frequency;
+        row.insertCell(3).innerHTML = `<button onclick="openPortfolio(${member.member_id})">View</button>`;
     });
+}
+
+function openPortfolio(memberId) {
+    fetch(`/member/${memberId}/portfolio`, { credentials: 'include' })
+        .then(res => {
+            if (res.status === 403) {
+                document.getElementById('portfolio-details').style.display = 'block';
+                document.getElementById('portfolio-details').innerHTML = '<strong>Access Denied</strong>';
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            if (data.error) {
+                document.getElementById('portfolio-details').style.display = 'block';
+                document.getElementById('portfolio-details').innerHTML = `<strong>${data.error}</strong>`;
+                return;
+            }
+
+            let html = `<h3>Member Portfolio: ${data.member.full_name}</h3>`;
+            html += `<p><strong>Role / Designation:</strong> ${data.member.designation}</p>`;
+            html += `<p><strong>Age/Gender:</strong> ${data.member.age}/${data.member.gender}</p>`;
+            html += `<p><strong>Department:</strong> ${data.member.department.dept_name} (${data.member.department.dept_code})</p>`;
+            html += `<p><strong>Join Date:</strong> ${data.member.join_date}</p>`;
+
+            if (data.contacts && data.contacts.length > 0) {
+                html += '<h4>Contacts</h4>';
+                html += '<ul>';
+                data.contacts.forEach(c => {
+                    html += `<li>${c.contact_type}: ${c.contact_value}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            if (data.locations && data.locations.length > 0) {
+                html += '<h4>Locations</h4>';
+                html += '<ul>';
+                data.locations.forEach(l => {
+                    html += `<li>${l.location_type} at ${l.building_name} ${l.room_number}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            if (data.emergency_contacts && data.emergency_contacts.length > 0) {
+                html += '<h4>Emergency Contacts</h4>';
+                html += '<ul>';
+                data.emergency_contacts.forEach(e => {
+                    html += `<li>${e.contact_person_name} (${e.relation}): ${e.emergency_phone}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            const detailsNode = document.getElementById('portfolio-details');
+            detailsNode.style.display = 'block';
+            detailsNode.innerHTML = html;
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('portfolio-details').style.display = 'block';
+            document.getElementById('portfolio-details').innerHTML = '<strong>Error loading portfolio</strong>';
+        });
 }
 
 function fetchMembers(log = true) {

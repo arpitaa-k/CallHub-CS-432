@@ -719,33 +719,62 @@ def delete_member(id):
 def search_member():
 
     name = request.args.get("name", "")
-    role = request.args.get("role", "")
+    role = request.args.get("role", "").strip()
     log = request.args.get("log", "true").lower() == "true"
 
     cur = mysql.connection.cursor()
 
-    # Search all members by name (no category filtering)
-    # Category permissions are checked in get_member endpoint
-    query = f"""
-    SELECT 
-        m.member_id, 
-        m.full_name, 
-        m.designation,
-        COALESCE(SUM(s.results_found_count), 0) AS frequency
+    # Search all members by name, optionally filter by selected role.
+    # Category permissions are checked in get_member endpoint.
+    # Use EXISTS to avoid result duplication when member has multiple roles.
+    if role:
+        query = f"""
+        SELECT 
+            m.member_id, 
+            m.full_name, 
+            m.designation,
+            COALESCE(SUM(s.results_found_count), 0) AS frequency
 
-    FROM Members m
+        FROM Members m
 
-    LEFT JOIN Search_Logs s 
-        ON m.full_name LIKE CONCAT(s.searched_term, '%%')
+        LEFT JOIN Search_Logs s 
+            ON m.full_name LIKE CONCAT(s.searched_term, '%%')
 
-    WHERE m.full_name LIKE %s
-    AND m.is_deleted = 0
+        WHERE m.full_name LIKE %s
+        AND m.is_deleted = 0
+        AND EXISTS (
+            SELECT 1 FROM Member_Role_Assignments mra
+            JOIN Roles r ON mra.role_id = r.role_id
+            WHERE mra.member_id = m.member_id
+            AND r.role_title = %s
+        )
 
-    GROUP BY m.member_id
-    ORDER BY frequency DESC
-    """
+        GROUP BY m.member_id
+        ORDER BY frequency DESC
+        """
 
-    params = [f"{name}%"]
+        params = [f"{name}%", role]
+    else:
+        query = f"""
+        SELECT 
+            m.member_id, 
+            m.full_name, 
+            m.designation,
+            COALESCE(COUNT(s.searched_term), 0) AS frequency
+
+        FROM Members m
+
+        LEFT JOIN Search_Logs s 
+            ON m.full_name LIKE CONCAT(s.searched_term, '%%')
+
+        WHERE m.full_name LIKE %s
+        AND m.is_deleted = 0
+
+        GROUP BY m.member_id
+        ORDER BY frequency DESC
+        """
+
+        params = [f"{name}%"]
 
     cur.execute(query, params)
 
@@ -763,11 +792,12 @@ def search_member():
         })
 
     # Store search log (only when logging is enabled)
+    # Use 1 per search event (not total result count) so each matched member increments 1.
     if log:
         cur.execute("""
             INSERT INTO Search_Logs (searched_term, searched_by_member_id, results_found_count)
             VALUES (%s, %s, %s)
-        """, (name, session["member_id"], len(rows)))
+        """, (name, session["member_id"], 1))
 
         mysql.connection.commit()
 

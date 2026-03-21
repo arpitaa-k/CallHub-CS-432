@@ -11,11 +11,11 @@ def has_permission(member_id, category_id):
         ON mra.role_id = rp.role_id
         WHERE mra.member_id=%s
         AND rp.category_id=%s
-    """,(member_id,category_id))
+    """, (member_id, category_id))
 
     result = cur.fetchone()
 
-    return result is not None
+    return result is not None and result[0] == 1
 
 
 def is_admin(member_id):

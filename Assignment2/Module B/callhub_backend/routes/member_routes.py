@@ -7,9 +7,8 @@ import bcrypt
 
 members = Blueprint("members", __name__)
 
-# ----------------------------
 # Get editable roles for current user
-# ----------------------------
+
 @members.route("/editable-roles", methods=["GET"])
 @login_required
 def get_editable_roles():
@@ -50,9 +49,8 @@ def get_editable_roles():
     return jsonify(result)
 
 
-# ----------------------------
-# Get all members (optionally filtered by role)
-# ----------------------------
+# Get all members and filter by role:
+
 @members.route("/members", methods=["GET"])
 @login_required
 def get_members():
@@ -101,9 +99,7 @@ def get_members():
     return jsonify(result)
 
 
-# ----------------------------
 # Create member (Admin only)
-# ----------------------------
 @members.route("/members", methods=["POST"])
 @login_required
 def create_member():
@@ -201,7 +197,7 @@ def create_member():
             VALUES (%s, %s, %s)
         """, (new_member_id, username, hashed.decode()))
 
-        # Insert Member_Role_Assignments (include assigned_date if provided)
+        # Insert Member_Role_Assignments (optional)
         if assign_date:
             cur.execute("""
                 INSERT INTO Member_Role_Assignments (member_id, role_id, assigned_date)
@@ -225,9 +221,7 @@ def create_member():
         return {"error": str(e)}, 500
 
 
-# ----------------------------
 # Get member by id
-# ----------------------------
 @members.route("/members/<int:id>", methods=["GET"])
 @login_required
 def get_member(id):
@@ -365,7 +359,7 @@ def get_member(id):
         if role_assignment:
             data["role_title"] = role_assignment[0] if role_assignment[0] else ""
             
-            # Format assigned_date properly for date input (YYYY-MM-DD)
+            # Format assigned_date properly for date input (in YYYY-MM-DD form)
             if role_assignment[1]:
                 assign_dt = role_assignment[1]
                 if hasattr(assign_dt, 'date'):
@@ -387,9 +381,7 @@ def get_member(id):
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 
-# ----------------------------
 # Update member (Admin only)
-# ----------------------------
 @members.route("/members/<int:id>", methods=["PUT"])
 @login_required
 def update_member(id):
@@ -496,9 +488,7 @@ def update_member(id):
         return {"error": str(e)}, 500
 
 
-# ----------------------------
 # Soft delete member (Admin only)
-# ----------------------------
 @members.route("/members/<int:id>", methods=["DELETE"])
 @login_required
 def delete_member(id):
@@ -523,199 +513,18 @@ def delete_member(id):
     log_action(actor_id, "Members", id, "SOFT_DELETE")
 
     return {"message":"Member deleted"}
-
-
-## ----------------------------
-# Search members
-# ----------------------------
-# ----------------------------
-# Search members (FINAL)
-# ----------------------------
-# @members.route("/search", methods=["GET"])
-# @login_required
-# def search_member():
-
-#     name = request.args.get("name", "")
-#     role = request.args.get("role", "")
-
-#     cur = mysql.connection.cursor()
-
-#     # ----------------------------
-#     # STEP 1: Get allowed category
-#     # ----------------------------
-#     cur.execute("""
-#         SELECT rp.category_id
-#         FROM Roles r
-#         JOIN Role_Permissions rp ON r.role_id = rp.role_id
-#         WHERE r.role_title = %s AND rp.can_view = 1
-#     """, (role,))
-
-#     permission = cur.fetchone()
-
-#     # If role not found → deny
-#     if not permission:
-#         return jsonify({"error": "Access Denied"}), 403
-
-#     allowed_category = permission[0]
-
-#     # ----------------------------
-#     # STEP 2: Fetch members
-#     # (filter by name + category)
-#     # ----------------------------
-#     cur.execute("""
-#     SELECT 
-#         m.member_id, 
-#         m.full_name, 
-#         m.designation,
-#         COUNT(s.log_id) AS frequency
-#     FROM Members m
-
-#     LEFT JOIN Search_Logs s 
-#         ON m.member_id = s.searched_by_member_id
-
-#     JOIN Contact_Details cd 
-#         ON m.member_id = cd.member_id
-
-#     WHERE m.full_name LIKE %s
-#     AND cd.category_id IN %s
-#     AND m.is_deleted = 0
-
-#     GROUP BY m.member_id
-#     ORDER BY frequency DESC
-#     """, (f"%{name}%", allowed_category))
-
-#     rows = cur.fetchall()
-
-   
-
-#     # ----------------------------
-#     # STEP 3: Format response
-#     # ----------------------------
-#     result = []
-
-#     for row in rows:
-#         result.append({
-#             "member_id": row[0],
-#             "full_name": row[1],
-#             "designation": row[2],
-#             "frequency": row[3]
-#         })
-
-#     # ----------------------------
-#     # STEP 4: Update search_logs
-#     # (increase frequency)
-#     # ----------------------------
-#     for row in rows:
-#         member_id = row[0]
-#
-#         cur.execute("""
-#             INSERT INTO Search_Logs (member_id, results_found_count)
-#             VALUES (%s, 1)
-#             ON DUPLICATE KEY UPDATE 
-#             results_found_count = results_found_count + 1
-#         """, (member_id,))
-
-
-##     return jsonify(result)
-
-# @members.route("/search", methods=["GET"])
-# @login_required
-# def search_member():
-
-#     name = request.args.get("name", "")
-#     role = request.args.get("role", "")
-
-#     cur = mysql.connection.cursor()
-
-#     # STEP 1: Get allowed categories
-#     cur.execute("""
-#         SELECT rp.category_id
-#         FROM Roles r
-#         JOIN Role_Permissions rp ON r.role_id = rp.role_id
-#         WHERE r.role_title = %s AND rp.can_view = 1
-#     """, (role,))
-
-#     permissions = cur.fetchall()
-
-#     allowed_categories = tuple([p[0] for p in permissions])
-
-#     if not allowed_categories:
-#         return jsonify({"error": "Access Denied"}), 403
-
-#     # STEP 2: Fetch members
-#     # query = f"""
-#     # SELECT 
-#     #     m.member_id, 
-#     #     m.full_name, 
-#     #     m.designation,
-#     #     COUNT(s.log_id) AS frequency
-#     # FROM Members m
-
-#     # LEFT JOIN Search_Logs s 
-#     #     ON m.member_id = s.searched_by_member_id
-
-#     # JOIN Contact_Details cd 
-#     #     ON m.member_id = cd.member_id
-
-#     # WHERE m.full_name LIKE %s
-#     # AND cd.category_id IN ({','.join(['%s'] * len(allowed_categories))})
-#     # AND m.is_deleted = 0
-
-#     # GROUP BY m.member_id
-#     # ORDER BY frequency DESC
-#     # """
-#     query = f"""
-#         SELECT 
-#         m.member_id, 
-#         m.full_name, 
-#         m.designation,
-#         COALESCE(SUM(s.results_found_count),0) AS frequency
-
-#     FROM Members m
-
-#     LEFT JOIN Search_Logs s 
-#         ON m.full_name LIKE CONCAT(s.searched_term, '%')
-
-#     JOIN Contact_Details cd 
-#         ON m.member_id = cd.member_id
-
-#     WHERE m.full_name LIKE %s
-#     AND cd.category_id IN ({','.join(['%s'] * len(allowed_categories))})
-#     AND m.is_deleted = 0
-
-#     GROUP BY m.member_id
-#     ORDER BY frequency DESC
-
-#     """
-
-#     cur.execute(query, (f"{name}%", *allowed_categories))
-
-#     rows = cur.fetchall()
-
-#     # STEP 3: Format response
-#     result = []
-#     for row in rows:
-#         result.append({
-#             "member_id": row[0],
-#             "full_name": row[1],
-#             "designation": row[2],
-#             "frequency": row[3]
-#         })
-
-#     # STEP 4: Log search
+    #Log search
     if log:
         cur.execute("""
             INSERT INTO Search_Logs (searched_term, searched_by_member_id, results_found_count)
             VALUES (%s, %s, %s)
         """, (name, session["member_id"], len(rows)))
 
-        mysql.connection.commit()
+        mysql.connection.commit()  #return jsonify(result)
+     
 
-#     return jsonify(result)
-
-
-@members.route("/search", methods=["GET"])
-@login_required
+@members.route("/search", methods=["GET"])  # Search all members by name, optionally filter by selected role.
+@login_required  
 def search_member():
 
     name = request.args.get("name", "")
@@ -724,16 +533,13 @@ def search_member():
 
     cur = mysql.connection.cursor()
 
-    # Search all members by name, optionally filter by selected role.
-    # Category permissions are checked in get_member endpoint.
-    # Use EXISTS to avoid result duplication when member has multiple roles.
-    if role:
+    if role:  # Category permissions are checked in get_member endpoint
         query = f"""
         SELECT 
             m.member_id, 
             m.full_name, 
             m.designation,
-            COALESCE(SUM(s.results_found_count), 0) AS frequency
+            COALESCE(SUM(s.results_found_count), 0) AS frequency   
 
         FROM Members m
 
@@ -753,7 +559,7 @@ def search_member():
         ORDER BY frequency DESC
         """
 
-        params = [f"{name}%", role]
+        params = [f"{name}%", role]   # Use EXISTS to avoid result duplication when member has multiple roles.
     else:
         query = f"""
         SELECT 
@@ -792,7 +598,6 @@ def search_member():
         })
 
     # Store search log (only when logging is enabled)
-    # Use 1 per search event (not total result count) so each matched member increments 1.
     if log:
         cur.execute("""
             INSERT INTO Search_Logs (searched_term, searched_by_member_id, results_found_count)

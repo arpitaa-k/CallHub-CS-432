@@ -1,0 +1,79 @@
+[
+    {
+        "desc": "Name Search",
+        "query": "SELECT * FROM Members WHERE full_name LIKE 'A%'",
+        "time": 0.024968385696411133,
+        "explain": [
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "Members",
+                "partitions": null,
+                "type": "range",
+                "possible_keys": "idx_members_name",
+                "key": "idx_members_name",
+                "key_len": "402",
+                "ref": null,
+                "rows": 4056,
+                "filtered": 100.0,
+                "Extra": "Using index condition"
+            }
+        ]
+    },
+    {
+        "desc": "Designation Filter",
+        "query": "SELECT * FROM Members WHERE designation = 'Professor' AND is_deleted = 0",
+        "time": 0.04255032539367676,
+        "explain": [
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "Members",
+                "partitions": null,
+                "type": "ref",
+                "possible_keys": "idx_members_lookup",
+                "key": "idx_members_lookup",
+                "key_len": "404",
+                "ref": "const,const",
+                "rows": 16562,
+                "filtered": 100.0,
+                "Extra": null
+            }
+        ]
+    },
+    {
+        "desc": "Privacy Engine Join",
+        "query": "SELECT DISTINCT rp.category_id FROM Member_Role_Assignments mra \n            JOIN Role_Permissions rp ON mra.role_id = rp.role_id \n            WHERE mra.member_id = 1 AND rp.can_view = 1",
+        "time": 0.0,
+        "explain": [
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "mra",
+                "partitions": null,
+                "type": "ref",
+                "possible_keys": "role_id,idx_mra_comp",
+                "key": "idx_mra_comp",
+                "key_len": "4",
+                "ref": "const",
+                "rows": 1,
+                "filtered": 100.0,
+                "Extra": "Using index; Using temporary"
+            },
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "rp",
+                "partitions": null,
+                "type": "ref",
+                "possible_keys": "category_id,idx_rp_comp",
+                "key": "idx_rp_comp",
+                "key_len": "6",
+                "ref": "module_a1_final.mra.role_id,const",
+                "rows": 2,
+                "filtered": 100.0,
+                "Extra": null
+            }
+        ]
+    }
+]

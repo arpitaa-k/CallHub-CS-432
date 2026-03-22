@@ -77,11 +77,35 @@ Assignment2/
 - Python 3.10 or higher  
 - pip  
 - Virtual environment 
-- MySQL (or database configured in `config.py`)  
+- MySQL (or database configured in `config.py`)
+- Optional (for Module A visualizations): Graphviz installed on your system.  
 
 ---
+## Setup Instructions for Module A
 
-##  Setup Instructions  
+### 1. Navigate to Module A Directory
+```bash
+cd "Assignment2/Module A"
+```
+
+### 2. Create Virtual Environment
+```bash
+python -m venv .venv
+```
+
+### 3. Activate Virtual Environment
+
+**Windows:**
+```bash
+.\.venv\Scripts\activate
+```
+
+### 4. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+##  Setup Instructions  for module B
 
 ### 1. Navigate to Backend Directory  
 ```bash

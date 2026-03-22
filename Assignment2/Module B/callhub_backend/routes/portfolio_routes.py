@@ -11,7 +11,7 @@ def get_portfolio(member_id):
 
     actor_id = session["member_id"]
 
-    # Data visibility should be based on caller role permissions only (no owner bypass)
+    # Role Permissions based Data visibility 
     cur = mysql.connection.cursor()
 
     cur.execute("""

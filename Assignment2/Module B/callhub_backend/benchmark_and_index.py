@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import mysql.connector  # Use psycopg2 for PostgreSQL
 from datetime import datetime
 
-# --- Load .env ---
+# Load .env
 load_dotenv()
 DB_CONFIG = {
     'host': os.getenv('MYSQL_HOST'),
@@ -18,7 +18,7 @@ DB_CONFIG = {
 }
 API_BASE_URL = "http://localhost:5000"  # Added back for API timing
 
-# --- ENUMS and Reference Data ---
+# ENUMS and Reference Data 
 GENDERS = ['M', 'F', 'O']
 CONTACT_TYPES = ['Mobile', 'Personal Email', 'Landline', 'Official Email']
 LOCATION_TYPES = ['Office', 'Hostel Room', 'Lab', 'Residence', 'Post']
@@ -35,21 +35,20 @@ def generate_departments(cur):
     # Only if table is empty
     cur.execute("SELECT COUNT(*) FROM Departments")
     if cur.fetchone()[0] == 0:
-        # Insert your fixed department data here (see your schema)
-        pass  # Already in your schema, skip for random
+        pass  # If already in schema, skip for random
 
 def generate_data_categories(cur):
     # Only if table is empty
     cur.execute("SELECT COUNT(*) FROM Data_Categories")
     if cur.fetchone()[0] == 0:
-        # Insert your fixed categories here
+        # Insert fixed categories 
         pass
 
 def generate_roles(cur):
     # Only if table is empty
     cur.execute("SELECT COUNT(*) FROM Roles")
     if cur.fetchone()[0] == 0:
-        # Insert your fixed roles here
+        # Insert fixed roles 
         pass
 
 def get_ids(cur, table, id_col):
@@ -59,7 +58,7 @@ def get_ids(cur, table, id_col):
 def generate_members(cur, n=5000):
     dept_ids = get_ids(cur, "Departments", "dept_id")
     members = []
-    # 1 HOD per dept
+    # HOD per dept
     for dept_id in dept_ids:
         name = fake.name()
         cur.execute(
@@ -67,7 +66,7 @@ def generate_members(cur, n=5000):
             (name, f"HOD", random.randint(35, 65), random.choice(GENDERS), dept_id, fake.date_between(start_date='-10y', end_date='today'))
         )
         members.append((cur.lastrowid, dept_id, "HOD"))
-    # 3 Professors per dept
+    # Professors per dept
     for dept_id in dept_ids:
         for _ in range(3):
             name = fake.name()
@@ -76,7 +75,7 @@ def generate_members(cur, n=5000):
                 (name, "Professor", random.randint(30, 65), random.choice(GENDERS), dept_id, fake.date_between(start_date='-10y', end_date='today'))
             )
             members.append((cur.lastrowid, dept_id, "Professor"))
-    # 2 Staff per dept
+    # Staff per dept
     for dept_id in dept_ids:
         for _ in range(2):
             name = fake.name()
@@ -85,7 +84,7 @@ def generate_members(cur, n=5000):
                 (name, "Staff", random.randint(25, 60), random.choice(GENDERS), dept_id, fake.date_between(start_date='-10y', end_date='today'))
             )
             members.append((cur.lastrowid, dept_id, "Staff"))
-    # 10 Students (UG) per dept
+    # Students (UG) per dept
     for dept_id in dept_ids:
         for _ in range(10):
             name = fake.name()
@@ -94,7 +93,7 @@ def generate_members(cur, n=5000):
                 (name, "Student (UG)", random.randint(17, 25), random.choice(GENDERS), dept_id, fake.date_between(start_date='-6y', end_date='today'))
             )
             members.append((cur.lastrowid, dept_id, "Student (UG)"))
-    # 5 Students (PG/PhD) per dept
+    # Students (PG/PhD) per dept
     for dept_id in dept_ids:
         for _ in range(5):
             name = fake.name()
@@ -103,7 +102,7 @@ def generate_members(cur, n=5000):
                 (name, "Student (PG/PhD)", random.randint(22, 35), random.choice(GENDERS), dept_id, fake.date_between(start_date='-8y', end_date='today'))
             )
             members.append((cur.lastrowid, dept_id, "Student (PG/PhD)"))
-    # Fill up to n with random staff
+    # Fill up to n with random details
     while len(members) < n:
         dept_id = random.choice(dept_ids)
         name = fake.name()
@@ -257,15 +256,12 @@ def save_snapshot(tag, api_times, profile_results):
     profile_path = os.path.join(d, profile_fname)
     _write_json(api_path, api_times)
     _write_json(profile_path, profile_results)
-
-    # Also write latest copies at repo root for backward compatibility
     _write_json('callhub_api_times_latest.json', api_times)
     _write_json('callhub_benchmark_profile_latest.json', profile_results)
 
 def profile_queries():
     conn = get_connection()
     cur = conn.cursor()
-    # Real queries from your API routes (based on member_routes.py and portfolio_routes.py)
     queries = [
         ("SELECT member_id, full_name, designation, age, gender, dept_id, join_date, is_active FROM Members WHERE member_id = 1 AND is_deleted = 0", "Portfolio: Get member info"),
         ("SELECT DISTINCT rp.category_id FROM Member_Role_Assignments mra JOIN Role_Permissions rp ON mra.role_id = rp.role_id WHERE mra.member_id = 1 AND rp.can_view = 1", "Portfolio: Get allowed categories"),
@@ -278,7 +274,6 @@ def profile_queries():
     results = []
     for query, desc in queries:
         print(f"\nQuery ({desc}): {query}")
-        # EXPLAIN
         try:
             cur.execute(f"EXPLAIN {query}")
             explain_rows = cur.fetchall()
@@ -315,9 +310,7 @@ def apply_indexes():
     conn = get_connection()
     cur = conn.cursor()
     print("\n--- Applying Indexes ---")
-    # Avoid re-indexing primary key columns. Add composite indexes to support queries with multiple WHERE filters.
     index_queries = [
-        # single-column useful indexes
         "CREATE INDEX idx_members_full_name ON Members(full_name)",
         "CREATE INDEX idx_members_designation ON Members(designation)",
         "CREATE INDEX idx_members_is_deleted ON Members(is_deleted)",
@@ -325,7 +318,6 @@ def apply_indexes():
         "CREATE INDEX idx_mra_member_id ON Member_Role_Assignments(member_id)",
         "CREATE INDEX idx_rp_role_id ON Role_Permissions(role_id)",
         "CREATE INDEX idx_rp_category_id ON Role_Permissions(category_id)",
-        # composite indexes to help multi-column filters
         "CREATE INDEX idx_members_isdeleted_fullname ON Members(is_deleted, full_name)",
         "CREATE INDEX idx_members_designation_isdeleted ON Members(designation, is_deleted)",
     ]
@@ -334,7 +326,6 @@ def apply_indexes():
             cur.execute(index_sql)
             print(f"Created: {index_sql}")
         except mysql.connector.Error as e:
-            # MySQL raises error when index already exists (errno 1061 or duplicate-key messages).
             # Skip duplicate-index errors, re-raise others.
             err_no = getattr(e, 'errno', None)
             msg = str(e)
@@ -348,29 +339,25 @@ def apply_indexes():
     print("Indexes applied.")
 
 
-# Audit/trigger setup moved to `setup_audit_triggers.py` to keep this script focused
-# on benchmarking and indexing. If you want to create the `source` column and
-# the DB triggers, run `python setup_audit_triggers.py` from `callhub_backend`.
-
 def main():
-    # 0. Ensure audit column & triggers to detect direct DB changes
+    # Ensure audit column & triggers to detect direct DB changes
     ensure_audit_column_and_triggers()
 
-    # 1. Generate random data
+    # Generate random data
     generate_all_data()
 
-    # 2. Record API response times and profile queries BEFORE indexing
+    # Record API response times and profile queries BEFORE indexing
     print('\n--- Running benchmarks BEFORE indexing ---')
     api_before = time_api_endpoints()
     profile_before = profile_queries()
 
-    # persist BEFORE snapshot
+    # Persist BEFORE snapshot
     save_snapshot('before', api_before, profile_before)
 
-    # 3. Apply indexes
+    # Apply indexes
     apply_indexes()
 
-    # 4. Record API response times and profile queries AFTER indexing
+    # Record API response times and profile queries AFTER indexing
     print('\n--- Running benchmarks AFTER indexing ---')
     api_after = time_api_endpoints()
     profile_after = profile_queries()

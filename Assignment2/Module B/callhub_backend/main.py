@@ -58,9 +58,7 @@ def add_header(response):
     response.headers['Expires'] = '0'
     return response
 
-# ------------------------
-# FRONTEND ROUTES
-# ------------------------
+# Connect the FRONTEND ROUTES
 
 @app.route("/")
 def login_page():

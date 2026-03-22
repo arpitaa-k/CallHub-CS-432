@@ -23,7 +23,7 @@ def log_action(actor_id, table, record_id, action, source='API'):
 
     cur = mysql.connection.cursor()
 
-    # Ensure Audit_Trail has a `source` column. If not, attempt to add it (no-op if already present).
+    # no-op if already present.
     try:
         cur.execute("SELECT source FROM Audit_Trail LIMIT 1")
     except Exception:
@@ -31,7 +31,7 @@ def log_action(actor_id, table, record_id, action, source='API'):
             cur.execute("ALTER TABLE Audit_Trail ADD COLUMN source VARCHAR(16) DEFAULT 'API'")
             mysql.connection.commit()
         except Exception:
-            # If alter fails, ignore; the insert below will still work if DB schema differs.
+            # If alter fails, ignore;
             pass
 
     try:
@@ -42,7 +42,7 @@ def log_action(actor_id, table, record_id, action, source='API'):
         """, (actor_id, table, record_id, action, source))
         mysql.connection.commit()
     except Exception:
-        # fallback: try without `source` column
+        # fallback:
         try:
             cur.execute("""
                 INSERT INTO Audit_Trail
@@ -51,7 +51,7 @@ def log_action(actor_id, table, record_id, action, source='API'):
             """, (actor_id, table, record_id, action))
             mysql.connection.commit()
         except Exception:
-            # give up silently to avoid breaking API flow; printing for debug
+            # give up silently to avoid breaking API flow;
             print("Failed to write Audit_Trail entry")
 
     # Append human-readable log to file

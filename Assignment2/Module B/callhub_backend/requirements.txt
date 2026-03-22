@@ -1,6 +1,8 @@
-Flask==2.3.2
-mysql-connector-python==8.1.0
-python-dotenv==1.0.0
-Faker==23.3.1
-requests==2.31.0
-matplotlib==3.8.1
+Flask
+mysql-connector-python
+dotenv
+Faker
+requests
+matplotlib
+flask_mysqldb
+bcrypt

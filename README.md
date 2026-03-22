@@ -112,6 +112,14 @@ python main.py
 ```
 
 Open your browser and go to the link showed after running this file.
+Open another terminal and run this to set a user credential for log iin . 
+
+```bash
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/register" `
+-Method POST `
+-ContentType "application/json" `
+-Body '{"username":"Prof. Arvind Mishra","password":"arvind ","member_id":9}'
+```
 
 ---
 
@@ -136,3 +144,4 @@ python benchmark_and_index.py
 ---
 
 After this the API response time and query execution time before and after indexing will be saved benchmarks/ directory in JSON files, and then can run report.ipynb to see the plots.
+

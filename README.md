@@ -7,8 +7,12 @@
 
 This project implements the **CallHub Phone Directory Management System** as part of CS-432 Assignment 2.  
 The system provides a complete solution for managing member information with secure access control, efficient data retrieval, and auditing mechanisms.
+* **Module A: Lightweight DBMS with B+ Tree Index:** A custom, in-memory database management system built from scratch. It uses a custom B+ Tree data structure to solve the inefficiencies of linear search (O(n)), enabling ultra-low latency contact lookups (O(log n)) and efficient range queries for scaling applications.
+* **Module B: Backend Application & UI:** A complete Flask-based backend providing a RESTful API, web interface, Role-Based Access Control (RBAC), and database auditing mechanisms.
 
-Key highlights of the system include:
+### Key Highlights
+- Custom B+ Tree indexing vs. Brute-force linear search benchmarking
+- Graphviz-based visualization of tree structure
 - Role-Based Access Control (RBAC)  
 - RESTful API development using Flask  
 - Web-based user interface  

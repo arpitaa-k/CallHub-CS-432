@@ -3,7 +3,7 @@
 
 ---
 
-##  Overview  
+##  Overview
 
 This project implements the **CallHub Phone Directory Management System** as part of CS-432 Assignment 2.  
 The system provides a complete solution for managing member information with secure access control, efficient data retrieval, and auditing mechanisms.
@@ -22,7 +22,14 @@ Key highlights of the system include:
 ```
 Assignment2/
 ├─ Module A/
-│  └─ b+tree.py
+│  ├─ database/
+│  │  ├─ bplustree.py              
+│  │  ├─ bruteforce.py             
+│  │  ├─ db_manager.py  
+│  │  ├─ performance_analyzer.py             
+│  │  ├─ table.py                  
+│  ├─ requirements.txt
+│  ├─ report.ipynb
 ├─ Module B/
 │  ├─ Module_B_Report.md
 │  ├─ benchmarks/ (# here json files will be saved)
@@ -112,14 +119,6 @@ python main.py
 ```
 
 Open your browser and go to the link showed after running this file.
-Open another terminal and run this to set a user credential for log iin . 
-
-```bash
-Invoke-RestMethod -Uri "http://127.0.0.1:5000/register" `
--Method POST `
--ContentType "application/json" `
--Body '{"username":"Prof. Arvind Mishra","password":"arvind ","member_id":9}'
-```
 
 ---
 
@@ -144,4 +143,3 @@ python benchmark_and_index.py
 ---
 
 After this the API response time and query execution time before and after indexing will be saved benchmarks/ directory in JSON files, and then can run report.ipynb to see the plots.
-

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Member</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        form { max-width: 600px; margin: auto; }
+        label { display: block; margin-top: 10px; }
+        input, select { width: 100%; padding: 8px; }
+        button { margin-top: 20px; padding: 10px; width: 100%; }
+        .role-selection { text-align: center; padding: 30px; }
+        .role-btn { margin: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        .search-bar { position: relative; margin: 20px 0; }
+        #suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; display: none; z-index: 10; }
+        .suggestion-item { padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .suggestion-item:hover { background: #f0f0f0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; }
+        tr { border-bottom: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+<h2 id="pageTitle">Update Member</h2>
+
+<p id="msg"></p>
+
+<!-- Role Selection Screen -->
+<div id="roleSelectionDiv" class="role-selection">
+    <h3>Select Role to Update</h3>
+    <div id="roleButtons"></div>
+</div>
+
+<!-- Search Screen (shown after role selection) -->
+<div id="searchScreenDiv" style="display: none;">
+    <h3>Search Members</h3>
+    
+    <div class="search-bar">
+        <input type="text" id="search" placeholder="Enter member name" oninput="onNameInput()">
+        <div id="suggestions"></div>
+    </div>
+    
+    <button onclick="backToRoles()">Back to Roles</button>
+</div>
+
+<!-- Update Form (shown after member selection) -->
+<form id="updateForm" style="display: none;">
+
+    <h3>Category</h3>
+    <label>Category Name</label>
+    <select id="category_name" required>
+        <option value="">Select Category</option>
+        <option>Public</option>
+        <option>Residential</option>
+        <option>Academic</option>
+        <option>Confidential</option>
+        <option>Emergency</option>
+    </select>
+
+    <h3>Role</h3>
+    <label>Role Title</label>
+    <select id="role_title" required disabled>
+        <option id="selectedRole" value=""></option>
+    </select>
+
+    <h3>Member Details</h3>
+    <label>Full Name</label>
+    <input type="text" id="full_name" required>
+
+    <label>Designation</label>
+    <input type="text" id="designation" required>
+
+    <label>Age</label>
+    <input type="number" id="age" required>
+
+    <label>Gender</label>
+    <select id="gender" required>
+        <option value="">Select Gender</option>
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+        <option value="O">Other</option>
+    </select>
+
+    <label>Join Date</label>
+    <input type="date" id="join_date" required>
+
+    <h3>Contact</h3>
+    <label>Assign Date (optional)</label>
+    <input type="date" id="assign_date">
+
+    <label>Contact Type</label>
+    <select id="contact_type" required>
+        <option value="">Select Type</option>
+        <option value="Mobile">Mobile</option>
+        <option value="Personal Email">Personal Email</option>
+        <option value="Landline">Landline</option>
+        <option value="Official Email">Official Email</option>
+    </select>
+
+    <label>Contact Value</label>
+    <input type="text" id="contact_value" required>
+
+    <h3>Location</h3>
+    <label>Location Type</label>
+    <select id="location_type" required>
+        <option value="">Select Type</option>
+        <option>Office</option>
+        <option>Hostel Room</option>
+        <option>Lab</option>
+        <option>Residence</option>
+        <option>Post</option>
+    </select>
+
+    <label>Building Name</label>
+    <input type="text" id="building_name" required>
+
+    <label>Room Number</label>
+    <input type="text" id="room_number" required>
+
+    <h3>Emergency Contact</h3>
+    <label>Person Name</label>
+    <input type="text" id="emergency_name" required>
+
+    <label>Relation</label>
+    <input type="text" id="relation" required>
+
+    <label>Contact Number</label>
+    <input type="text" id="emergency_contact" required>
+
+    <h3>Credentials</h3>
+    <label>Username</label>
+    <input type="text" id="username" required>
+
+    <label>Password (leave blank to keep current)</label>
+    <input type="password" id="password">
+
+    <button type="submit">Update Member</button>
+    <button type="button" onclick="backToSearch()">Back</button>
+
+</form>
+
+<script>
+
+let selectedRole = "";
+let selectedMemberId = "";
+let suggestionTimer;
+
+function backToRoles() {
+    selectedRole = "";
+    selectedMemberId = "";
+    document.getElementById("search").value = "";
+    document.getElementById("suggestions").style.display = "none";
+    document.getElementById("roleSelectionDiv").style.display = "block";
+    document.getElementById("searchScreenDiv").style.display = "none";
+    document.getElementById("updateForm").style.display = "none";
+}
+
+function backToSearch() {
+    document.getElementById("search").value = "";
+    document.getElementById("suggestions").style.display = "none";
+    document.getElementById("searchScreenDiv").style.display = "block";
+    document.getElementById("updateForm").style.display = "none";
+}
+
+// Fetch editable roles
+fetch("/editable-roles", { credentials: "include" })
+.then(res=>res.json())
+.then(data=>{
+    const roleDiv = document.getElementById("roleButtons");
+    roleDiv.innerHTML = "";
+    
+    if (!data || data.length === 0) {
+        document.getElementById("msg").innerText = "You do NOT have access to update members";
+        document.getElementById("roleSelectionDiv").style.display = "none";
+        return;
+    }
+    
+    data.forEach(role => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "role-btn";
+        btn.innerText = role.role_title;
+        btn.onclick = () => selectRole(role.role_title);
+        roleDiv.appendChild(btn);
+    });
+})
+
+function selectRole(roleTitle) {
+    selectedRole = roleTitle;
+    document.getElementById("selectedRole").value = roleTitle;
+    document.getElementById("selectedRole").text = roleTitle;
+    document.getElementById("roleSelectionDiv").style.display = "none";
+    document.getElementById("searchScreenDiv").style.display = "block";
+}
+
+function onNameInput() {
+    clearTimeout(suggestionTimer);
+
+    const name = document.getElementById("search").value;
+    if (!name) {
+        clearSuggestions();
+        return;
+    }
+
+    suggestionTimer = setTimeout(() => {
+        fetchMembers(false);
+    }, 250);
+}
+
+function clearSuggestions() {
+    const suggestions = document.getElementById("suggestions");
+    suggestions.style.display = "none";
+    suggestions.innerHTML = "";
+}
+
+function fetchMembers(log = false) {
+    const name = document.getElementById("search").value;
+    const role = selectedRole;
+
+    if (!role) {
+        alert("Please select a role");
+        return;
+    }
+
+    const url = `/search?name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&log=${log}`;
+
+    fetch(url, { credentials: "include" })
+        .then(res => {
+            if (res.status === 403) {
+                document.getElementById("msg").innerText = "Access Denied";
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+
+            if (log) {
+                clearSuggestions();
+            } else {
+                setSuggestions(data);
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
+function setSuggestions(data) {
+    const suggestions = document.getElementById("suggestions");
+
+    if (!data || data.length === 0) {
+        clearSuggestions();
+        return;
+    }
+
+    suggestions.style.display = "block";
+    suggestions.innerHTML = data
+        .map(member => `
+            <div class="suggestion-item" data-id="${member.member_id}" onclick="selectMember(${member.member_id})">
+                <strong>${member.full_name}</strong> (${member.designation}) - Frequency: ${member.frequency}
+            </div>
+        `)
+        .join("");
+}
+
+function selectMember(memberId) {
+    selectedMemberId = memberId;
+    clearSuggestions();
+    
+    // Fetch member details
+    fetch(`/members/${memberId}`, { credentials: "include" })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+    })
+    .then(data=>{
+        if (data.error) {
+            alert("Error: " + data.error);
+            return;
+        }
+        
+        // Fill form with member data
+        document.getElementById("category_name").value = data.category_name || "";
+        document.getElementById("full_name").value = data.full_name || "";
+        document.getElementById("designation").value = data.designation || "";
+        document.getElementById("age").value = data.age || "";
+        document.getElementById("gender").value = data.gender || "";
+        document.getElementById("join_date").value = data.join_date || "";
+        document.getElementById("assign_date").value = data.assign_date || "";
+        document.getElementById("contact_type").value = data.contact_type || "";
+        document.getElementById("contact_value").value = data.contact_value || "";
+        document.getElementById("location_type").value = data.location_type || "";
+        document.getElementById("building_name").value = data.building_name || "";
+        document.getElementById("room_number").value = data.room_number || "";
+        document.getElementById("emergency_name").value = data.emergency_name || "";
+        document.getElementById("relation").value = data.relation || "";
+        document.getElementById("emergency_contact").value = data.emergency_contact || "";
+        document.getElementById("username").value = data.username || "";
+        
+        document.getElementById("searchScreenDiv").style.display = "none";
+        document.getElementById("updateForm").style.display = "block";
+    })
+    .catch(err => {
+        console.error("Error fetching member:", err);
+        alert("Error fetching member data: " + err.message);
+    });
+}
+
+document.getElementById("updateForm").addEventListener("submit", function(e){
+
+e.preventDefault()
+
+const formData = {
+    category_name: document.getElementById("category_name").value,
+    role_title: document.getElementById("role_title").value,
+    full_name: document.getElementById("full_name").value,
+    designation: document.getElementById("designation").value,
+    age: document.getElementById("age").value,
+    gender: document.getElementById("gender").value,
+    join_date: document.getElementById("join_date").value,
+    assign_date: document.getElementById("assign_date").value || null,
+    contact_type: document.getElementById("contact_type").value,
+    contact_value: document.getElementById("contact_value").value,
+    location_type: document.getElementById("location_type").value,
+    building_name: document.getElementById("building_name").value,
+    room_number: document.getElementById("room_number").value,
+    emergency_name: document.getElementById("emergency_name").value,
+    relation: document.getElementById("relation").value,
+    emergency_contact: document.getElementById("emergency_contact").value,
+    username: document.getElementById("username").value,
+    password: document.getElementById("password").value || null
+}
+
+fetch(`/members/${selectedMemberId}`, {
+method:"PUT",
+credentials: "include",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(formData)
+})
+.then(res=>res.json())
+.then(data=>{
+if(data.message){
+window.location.href="/success"
+}else{
+alert(data.error)
+}
+})
+})
+</script>
+
+</body>
+</html>

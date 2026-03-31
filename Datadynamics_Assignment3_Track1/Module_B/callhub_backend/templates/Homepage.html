@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Home</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body class="home-page">
+
+<header class="header">
+	<div class="logo">
+		<img src="https://labs.iitgn.ac.in/muselaboratory/wp-content/uploads/2020/10/iitgnlogo-emblem.png" height="60">
+		<span>IITGN CallHub</span>
+	</div>
+	<div class="profile-box">
+		<div class="profile-avatar">
+			<svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#eee"/><circle cx="24" cy="20" r="10" fill="#bbb"/><ellipse cx="24" cy="38" rx="14" ry="8" fill="#bbb"/></svg>
+		</div>
+		<div class="profile-name">{{ name }}</div>
+		<button id="logout-link" class="logout-btn-red">Logout</button>
+	</div>
+</header>
+
+<div class="content home-welcome">
+	<h1 class="welcome-title">Welcome to IIT Gandhinagar CallHub!</h1>
+	<div class="portfolio-card">
+		<div class="portfolio-avatar">
+			<svg width="64" height="64" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#eee"/><circle cx="24" cy="20" r="10" fill="#bbb"/><ellipse cx="24" cy="38" rx="14" ry="8" fill="#bbb"/></svg>
+		</div>
+		<div class="portfolio-info">
+			<div class="portfolio-name">{{ name }}</div>
+			<div class="portfolio-role">{{ role }}</div>
+			<div class="portfolio-id">ID: {{username}}</div>
+		</div>
+	</div>
+	<div class="action-buttons">
+		<a href="/portfolio" class="action-btn main">My Portfolio</a>
+		<a href="/create" class="action-btn">Create</a>
+		<a href="/read" class="action-btn">Read</a>
+		<a href="/update" class="action-btn">Update</a>
+		<a href="/delete" class="action-btn">Delete</a>
+	</div>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div id="logout-modal" class="modal" style="display:none;">
+	<div class="modal-content">
+		<span class="modal-title">Are you sure you want to logout?</span>
+		<div class="modal-actions">
+			<button id="confirm-logout" class="modal-btn confirm">Logout</button>
+			<button id="cancel-logout" class="modal-btn cancel">Cancel</button>
+		</div>
+	</div>
+</div>
+
+
+<!-- Logout Confirmation Modal -->
+<div id="logout-modal" class="modal" style="display:none;">
+	<div class="modal-content">
+		<span class="modal-title">Are you sure you want to logout?</span>
+		<div class="modal-actions">
+			<button id="confirm-logout" class="modal-btn confirm">Logout</button>
+			<button id="cancel-logout" class="modal-btn cancel">Cancel</button>
+		</div>
+	</div>
+</div>
+
+</footer>
+
+<script>
+// Logout confirmation modal logic
+document.getElementById('logout-link').addEventListener('click', function(e) {
+	e.preventDefault();
+	document.getElementById('logout-modal').style.display = 'flex';
+});
+document.getElementById('cancel-logout').addEventListener('click', function() {
+	document.getElementById('logout-modal').style.display = 'none';
+});
+document.getElementById('confirm-logout').addEventListener('click', function() {
+	window.location.href = '/logout';
+});
+</script>
+
+
+
+</body>
+
+</html>

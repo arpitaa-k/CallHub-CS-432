@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Read Members</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            padding: 8px;
+            margin: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Members List</h2>
+
+<!-- 🔹 Search Section -->
+<div class="top-bar">
+
+    <!-- LEFT: Name Search -->
+    <div style="position: relative;">
+        <input type="text" id="search" placeholder="Enter name" oninput="onNameInput()">
+        <div id="suggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; display: none; z-index: 10;"></div>
+    </div>
+
+    <!-- RIGHT: Role Dropdown -->
+    <div>
+        <select id="role">
+            <option value="">Select Role</option>
+            <option>Director</option>
+            <option>Dean Academics</option>
+            <option>Dean Student Welfare</option>
+            <option>Registrar</option>
+            <option>HOD</option>
+            <option>Professor</option>
+            <option>Asst. Profesor</option>
+            <option>Student (UG)</option>
+            <option>Student (PG/PHD)</option>
+            <option>Warden</option>
+            <option>Security Guard</option>
+            <option>Medical Staff</option>
+        </select>
+
+        <button onclick="searchMember()">Search</button>
+    </div>
+
+</div>
+
+<!-- 🔹 Table -->
+<table border="1" id="membersTable">
+
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Designation</th>
+    <th>Details</th>
+</tr>
+
+</table>
+
+<div id="portfolio-details" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px; display:none;"></div>
+
+<!-- 🔹 Script -->
+<script>
+
+let suggestionTimer;
+
+function onNameInput() {
+    // Show suggestions as user types, but do NOT log these lookups.
+    clearTimeout(suggestionTimer);
+
+    const name = document.getElementById("search").value;
+    if (!name) {
+        clearSuggestions();
+        return;
+    }
+
+    suggestionTimer = setTimeout(() => {
+        fetchMembers(false);
+    }, 250);
+}
+
+function clearSuggestions() {
+    const suggestions = document.getElementById("suggestions");
+    suggestions.style.display = "none";
+    suggestions.innerHTML = "";
+}
+
+function setSuggestions(data) {
+    const suggestions = document.getElementById("suggestions");
+
+    if (!data || data.length === 0) {
+        clearSuggestions();
+        return;
+    }
+
+    suggestions.style.display = "block";
+    suggestions.innerHTML = data
+        .map(member => `
+            <div class="suggestion-item" data-name="${member.full_name}" style="padding: 8px; cursor: pointer; border-bottom: 1px solid #eee;">
+                <span>${member.full_name}</span>
+                <span style="float: right; color: #666;">${member.frequency}</span>
+            </div>
+        `)
+        .join("");
+
+    suggestions.querySelectorAll(".suggestion-item").forEach(el => {
+        el.addEventListener("click", () => {
+            document.getElementById("search").value = el.dataset.name;
+            clearSuggestions();
+            searchMember();
+        });
+    });
+}
+
+function updateTable(data) {
+    const table = document.getElementById("membersTable");
+
+    table.innerHTML = `
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Designation</th>
+            <th>Details</th>
+        </tr>
+    `;
+
+    if (!data || data.length === 0) {
+        table.innerHTML += `
+            <tr><td colspan="4">No members found</td></tr>
+        `;
+        return;
+    }
+
+    data.forEach(member => {
+        const row = table.insertRow();
+        row.insertCell(0).innerText = member.member_id;
+        row.insertCell(1).innerText = member.full_name;
+        row.insertCell(2).innerText = member.designation;
+        row.insertCell(3).innerHTML = `<button onclick="openPortfolio(${member.member_id})">View</button>`;
+    });
+}
+
+function openPortfolio(memberId) {
+    fetch(`/member/${memberId}/portfolio`, { credentials: 'include' })
+        .then(res => {
+            if (res.status === 403) {
+                document.getElementById('portfolio-details').style.display = 'block';
+                document.getElementById('portfolio-details').innerHTML = '<strong>Access Denied</strong>';
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            if (data.error) {
+                document.getElementById('portfolio-details').style.display = 'block';
+                document.getElementById('portfolio-details').innerHTML = `<strong>${data.error}</strong>`;
+                return;
+            }
+
+            let html = `<h3>Member Details: ${data.member.full_name}</h3>`;
+            html += `<p><strong>Role / Designation:</strong> ${data.member.designation}</p>`;
+            html += `<p><strong>Age/Gender:</strong> ${data.member.age}/${data.member.gender}</p>`;
+            html += `<p><strong>Department:</strong> ${data.member.department.dept_name} (${data.member.department.dept_code})</p>`;
+            html += `<p><strong>Join Date:</strong> ${data.member.join_date}</p>`;
+
+            if (data.contacts && data.contacts.length > 0) {
+                html += '<h4>Contacts</h4>';
+                html += '<ul>';
+                data.contacts.forEach(c => {
+                    html += `<li>${c.contact_type}: ${c.contact_value}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            if (data.locations && data.locations.length > 0) {
+                html += '<h4>Locations</h4>';
+                html += '<ul>';
+                data.locations.forEach(l => {
+                    html += `<li>${l.location_type} at ${l.building_name} ${l.room_number}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            if (data.emergency_contacts && data.emergency_contacts.length > 0) {
+                html += '<h4>Emergency Contacts</h4>';
+                html += '<ul>';
+                data.emergency_contacts.forEach(e => {
+                    html += `<li>${e.contact_person_name} (${e.relation}): ${e.emergency_phone}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            const detailsNode = document.getElementById('portfolio-details');
+            detailsNode.style.display = 'block';
+            detailsNode.innerHTML = html;
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('portfolio-details').style.display = 'block';
+            document.getElementById('portfolio-details').innerHTML = '<strong>Error loading portfolio</strong>';
+        });
+}
+
+function fetchMembers(log = true) {
+    const name = document.getElementById("search").value;
+    const role = document.getElementById("role").value;
+
+    if (role === "") {
+        if (log) {
+            alert("Please select a role");
+        } else {
+            clearSuggestions();
+        }
+        return;
+    }
+
+    const url = `/search?name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&log=${log}`;
+
+    fetch(url, { credentials: "include" })
+        .then(res => {
+            // 🔴 Handle access denied
+            if (res.status === 403) {
+                document.getElementById("membersTable").innerHTML = `
+                    <tr><td colspan="4">Access Denied</td></tr>
+                `;
+                clearSuggestions();
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+
+            if (log) {
+                clearSuggestions();
+                updateTable(data);
+            } else {
+                setSuggestions(data);
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            alert("Error fetching data");
+        });
+}
+
+function searchMember() {
+    fetchMembers(true);
+}
+
+// Only trigger a search when the user presses Enter, not on every keystroke.
+document.getElementById("search").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        searchMember();
+    }
+});
+
+// Close suggestions if user clicks outside
+document.addEventListener("click", (event) => {
+    if (!event.target.closest("#suggestions") && event.target.id !== "search") {
+        clearSuggestions();
+    }
+});
+
+</script>
+
+</body>
+</html>

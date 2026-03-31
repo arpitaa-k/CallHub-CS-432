@@ -1,6 +1,6 @@
 
 
-from database.bplustree import BPlusTree
+from bplustree import BPlusTree
 class Table:
     def __init__(self, name, schema, order=8, search_key=None):
         self.name = name                                     # Name of the table

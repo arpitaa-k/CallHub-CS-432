@@ -1,5 +1,5 @@
 
-from database.table import Table
+from table import Table
 
 class DatabaseManager:
     def __init__(self):

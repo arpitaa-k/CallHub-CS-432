@@ -3,6 +3,7 @@ Transaction Manager Module
 Implements ACID transaction support with multi-table transactions and crash recovery.
 """
 
+import os
 from typing import Dict, List, Set, Tuple, Any, Optional
 from enum import Enum
 from collections import defaultdict
@@ -54,7 +55,10 @@ class TransactionManager:
     - Atomicity through two-phase commit
     """
     
-    def __init__(self, database_manager, log_dir: str = "logs"):
+    def __init__(self, database_manager, log_dir: str = None):
+        if log_dir is None:
+            # Default: place logs in Module_A directory (parent of database folder)
+            log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logs")
         self.db_manager = database_manager
         self.logger = WriteAheadLogger(log_dir)
         self.lock_manager = LockManager()
@@ -136,11 +140,11 @@ class TransactionManager:
         # Save old state (for rollback)
         self.transaction_states[transaction_id][(table_name, key)] = None
         
+        # Log the operation before applying the change (WAL guarantee)
+        self.logger.log_insert(transaction_id, table_name, key, record)
+        
         # Perform insert
         table.data.insert(key, record)
-        
-        # Log the operation
-        self.logger.log_insert(transaction_id, table_name, key, record)
         
         # Track in transaction
         txn.add_operation('INSERT', table_name, key, None, record)
@@ -318,11 +322,11 @@ class TransactionManager:
         if (table_name, record_id) not in self.transaction_states[transaction_id]:
             self.transaction_states[transaction_id][(table_name, record_id)] = old_record.copy()
         
+        # Log the operation before applying the change (WAL guarantee)
+        self.logger.log_update(transaction_id, table_name, record_id, old_record, new_record)
+        
         # Perform update
         table.data.update(record_id, new_record)
-        
-        # Log the operation
-        self.logger.log_update(transaction_id, table_name, record_id, old_record, new_record)
         
         # Track in transaction
         txn.add_operation('UPDATE', table_name, record_id, old_record, new_record)
@@ -369,11 +373,11 @@ class TransactionManager:
         if (table_name, record_id) not in self.transaction_states[transaction_id]:
             self.transaction_states[transaction_id][(table_name, record_id)] = old_record.copy()
         
+        # Log the operation before applying the change (WAL guarantee)
+        self.logger.log_delete(transaction_id, table_name, record_id, old_record)
+        
         # Perform delete
         table.data.delete(record_id)
-        
-        # Log the operation
-        self.logger.log_delete(transaction_id, table_name, record_id, old_record)
         
         # Track in transaction
         txn.add_operation('DELETE', table_name, record_id, old_record, None)

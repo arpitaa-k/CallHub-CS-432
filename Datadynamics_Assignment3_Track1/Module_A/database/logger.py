@@ -80,9 +80,8 @@ class WriteAheadLogger:
         self.log_entries: List[LogEntry] = []
         self.log_id_counter = 0
         
-        # Create logs directory if it doesn't exist
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+        # Ensure logs directory exists
+        os.makedirs(self.log_dir, exist_ok=True)
         
         # Load existing logs
         self._load_logs()
@@ -195,6 +194,7 @@ class WriteAheadLogger:
     def _persist_entry(self, entry: LogEntry):
         """Write log entry to disk immediately (WAL guarantee)"""
         try:
+            os.makedirs(self.log_dir, exist_ok=True)
             with open(self.log_file, 'a') as f:
                 f.write(json.dumps(entry.to_dict()) + '\n')
                 f.flush()

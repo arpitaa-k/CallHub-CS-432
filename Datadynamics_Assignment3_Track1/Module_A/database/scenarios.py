@@ -25,15 +25,17 @@ class ScenarioRunner:
         print("SCENARIO SETUP")
         print("="*80)
         
-        # Clean previous logs (gracefully handle locked directories)
-        if os.path.exists("logs"):
+        # Clean previous logs from Module_A/logs (where TransactionManager stores them)
+        import os
+        module_a_logs = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logs")
+        if os.path.exists(module_a_logs):
             try:
-                shutil.rmtree("logs")
+                shutil.rmtree(module_a_logs)
             except PermissionError:
                 # Directory is locked, try removing files individually
                 try:
-                    for file in os.listdir("logs"):
-                        file_path = os.path.join("logs", file)
+                    for file in os.listdir(module_a_logs):
+                        file_path = os.path.join(module_a_logs, file)
                         if os.path.isfile(file_path):
                             os.remove(file_path)
                 except:

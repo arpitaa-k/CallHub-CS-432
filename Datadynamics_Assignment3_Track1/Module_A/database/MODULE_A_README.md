@@ -244,6 +244,36 @@ Scenarios included:
 4. Concurrent Updates (isolation testing)
 5. Crash Simulation & Recovery (durability verification)
 
+## Assignment 3 Validation
+
+### Execution Steps
+1. Open a terminal in `Datadynamics_Assignment3_Track1/Module_A/database`
+2. Run `python test_acid.py`
+3. Observe the summary output at the end to confirm all tests pass
+
+### What is Checked
+- Atomicity: multi-table transactions either fully commit or fully rollback
+- Consistency: schema validation and referential integrity are enforced
+- Isolation: shared read locks allow concurrent reads and prevent dirty reads
+- Durability: commit logs persist and committed changes survive recovery
+- Recovery: uncommitted transactions are undone, committed transactions are redone
+
+### Expected Result
+All ACID tests should pass with a success rate of `100%` after initializing the schema and sample data.
+
+### Important Notes
+- Logs are stored under `logs/transaction.log`
+- Recovery uses the write-ahead log to restore committed state and undo incomplete transactions
+- The B+ Tree remains consistent with table records during normal operations, rollback, and recovery
+
+## Log File Format
+
+1. Student Enrollment (5-table atomic transaction)
+2. Enrollment with Failure (atomicity verification)
+3. Department Creation (consistency check)
+4. Concurrent Updates (isolation testing)
+5. Crash Simulation & Recovery (durability verification)
+
 ## Performance Characteristics
 
 | Operation | Complexity | Notes |

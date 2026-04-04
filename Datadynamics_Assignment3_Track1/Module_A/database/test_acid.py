@@ -28,15 +28,16 @@ class AcidTestSuite:
         print("SETTING UP TEST ENVIRONMENT")
         print("="*70)
         
-        # Clean previous logs (gracefully handle locked directories)
-        if os.path.exists("logs"):
+        # Clean previous logs from Module_A/logs (where TransactionManager stores them)
+        module_a_logs = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logs")
+        if os.path.exists(module_a_logs):
             try:
-                shutil.rmtree("logs")
+                shutil.rmtree(module_a_logs)
             except PermissionError:
                 # Directory is locked, try removing files individually
                 try:
-                    for file in os.listdir("logs"):
-                        file_path = os.path.join("logs", file)
+                    for file in os.listdir(module_a_logs):
+                        file_path = os.path.join(module_a_logs, file)
                         if os.path.isfile(file_path):
                             os.remove(file_path)
                 except:
@@ -264,15 +265,14 @@ class AcidTestSuite:
         results = []
         
         def read_operation(txn_id, thread_num):
-            txm = TransactionManager(self.dm)
             table = self.dm.get_table(self.db_name, "Members")
             
             if table:
-                # Try to acquire read lock and read
-                if txm.lock_manager.acquire_read_lock(txn_id, "Members", 1):
+                # Try to acquire read lock and read using shared lock manager
+                if self.txm.lock_manager.acquire_read_lock(txn_id, "Members", 1):
                     record = table.get(1)
                     results.append(record is not None)
-                    txm.lock_manager.release_lock(txn_id, "Members", 1)
+                    self.txm.lock_manager.release_lock(txn_id, "Members", 1)
         
         # Create multiple concurrent read transactions
         threads = []

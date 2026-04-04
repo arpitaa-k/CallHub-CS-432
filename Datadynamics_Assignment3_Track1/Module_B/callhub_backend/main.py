@@ -13,7 +13,7 @@ import os
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 # Set session lifetime to 30 minutes of inactivity
-app.permanent_session_lifetime = timedelta(minutes=30)
+app.permanent_session_lifetime = timedelta(minutes = 30)
 
 # If the user is inactive for longer than `permanent_session_lifetime`, we'll clear the session.
 @app.before_request

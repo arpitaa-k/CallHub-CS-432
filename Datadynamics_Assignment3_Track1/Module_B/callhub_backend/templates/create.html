@@ -4,12 +4,174 @@
     <title>Create Member</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        form { max-width: 600px; margin: auto; }
-        label { display: block; margin-top: 10px; }
-        input, select { width: 100%; padding: 8px; }
-        button { margin-top: 20px; padding: 10px; width: 100%; }
-        .role-selection { text-align: center; padding: 30px; }
-        .role-btn { margin: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap');
+
+        :root {
+            --bg-a: #1f1a17;
+            --bg-b: #2b211d;
+            --panel: #ffffff;
+            --panel-soft: #fff8f3;
+            --line: #f3dccb;
+            --text: #2b211d;
+            --muted: #7a6557;
+            --accent: #ea580c;
+            --accent-dark: #c2410c;
+            --danger: #dc2626;
+            --shadow: 0 20px 45px rgba(44, 20, 6, 0.22);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Manrope', 'Trebuchet MS', sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 10% 20%, rgba(251, 146, 60, 0.2), transparent 30%),
+                radial-gradient(circle at 85% 15%, rgba(245, 158, 11, 0.18), transparent 28%),
+                linear-gradient(140deg, var(--bg-a), var(--bg-b));
+            padding: 24px;
+        }
+
+        h2#pageTitle {
+            margin: 8px auto 18px;
+            max-width: 980px;
+            font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+            font-weight: 800;
+            color: #e2e8f0;
+            letter-spacing: 0.2px;
+        }
+
+        #msg {
+            max-width: 980px;
+            margin: 0 auto 14px;
+            color: #fecaca;
+            font-weight: 700;
+        }
+
+        form,
+        .role-selection {
+            max-width: 980px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        h3 {
+            margin: 24px 0 10px;
+            padding-top: 8px;
+            border-top: 1px solid var(--line);
+            font-size: 1.03rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 0.2px;
+        }
+
+        h3:first-of-type {
+            border-top: 0;
+            margin-top: 6px;
+            padding-top: 0;
+        }
+
+        p {
+            margin: 6px 0 10px;
+            color: var(--muted);
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.92rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            margin-top: 6px;
+            padding: 11px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: var(--panel-soft);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #22d3ee;
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.22);
+            background: #fff;
+        }
+
+        #role_display {
+            border-radius: 10px !important;
+            border: 1px solid var(--line) !important;
+            background: #fff1e6 !important;
+            color: #9a3412;
+            font-weight: 800;
+        }
+
+        button {
+            margin-top: 12px;
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent), #f97316);
+            transition: transform 0.15s ease, filter 0.2s ease;
+        }
+
+        button:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+
+        .role-selection h3 { border: 0; margin-top: 0; }
+
+        #roleButtons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 14px;
+        }
+
+        .role-btn {
+            margin: 0;
+            min-width: 160px;
+            background: linear-gradient(135deg, #c2410c, #ea580c);
+        }
+
+        .contact-row,
+        .location-row,
+        .emergency-row {
+            border: 1px solid var(--line) !important;
+            border-radius: 14px;
+            background: #fbfdff;
+            padding: 14px !important;
+            margin-top: 12px !important;
+        }
+
+        .contact-row button,
+        .location-row button,
+        .emergency-row button {
+            background: linear-gradient(135deg, #ef4444, var(--danger));
+            margin-top: 14px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 14px; }
+            form,
+            .role-selection { padding: 16px; border-radius: 16px; }
+            .role-btn { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -30,15 +192,7 @@
     <!-- Department removed -->
 
     <h3>Category</h3>
-    <label>Category Name</label>
-    <select id="category_name" required>
-        <option value="">Select Category</option>
-        <option>Public</option>
-        <option>Residential</option>
-        <option>Academic</option>
-        <option>Confidential</option>
-        <option>Emergency</option>
-    </select>
+    <p>Set category per contact/location/emergency entry below.</p>
 
     <h3>Role</h3>
     <label>Role Title</label>
@@ -66,48 +220,19 @@
     <label>Join Date</label>
     <input type="date" id="join_date" required>
 
-    <h3>Contact</h3>
+    <h3>Contacts</h3>
     <label>Assign Date (optional)</label>
     <input type="date" id="assign_date">
+    <div id="contactsContainer"></div>
+    <button type="button" onclick="addContactRow()">+ Add Contact</button>
 
-    <label>Contact Type</label>
-    <select id="contact_type" required>
-        <option value="">Select Type</option>
-        <option value="Mobile">Mobile</option>
-        <option value="Personal Email">Personal Email</option>
-        <option value="Landline">Landline</option>
-        <option value="Official Email">Official Email</option>
-    </select>
+    <h3>Locations</h3>
+    <div id="locationsContainer"></div>
+    <button type="button" onclick="addLocationRow()">+ Add Location</button>
 
-    <label>Contact Value</label>
-    <input type="text" id="contact_value" required>
-
-    <h3>Location</h3>
-    <label>Location Type</label>
-    <select id="location_type" required>
-        <option value="">Select Type</option>
-        <option>Office</option>
-        <option>Hostel Room</option>
-        <option>Lab</option>
-        <option>Residence</option>
-        <option>Post</option>
-    </select>
-
-    <label>Building Name</label>
-    <input type="text" id="building_name" required>
-
-    <label>Room Number</label>
-    <input type="text" id="room_number" required>
-
-    <h3>Emergency Contact</h3>
-    <label>Person Name</label>
-    <input type="text" id="emergency_name" required>
-
-    <label>Relation</label>
-    <input type="text" id="relation" required>
-
-    <label>Contact Number</label>
-    <input type="text" id="emergency_contact" required>
+    <h3>Emergency Contacts</h3>
+    <div id="emergencyContainer"></div>
+    <button type="button" onclick="addEmergencyRow()">+ Add Emergency Contact</button>
 
     <h3>Credentials</h3>
     <label>Username</label>
@@ -162,12 +287,135 @@ function selectRole(roleTitle) {
     document.getElementById("createForm").style.display = "block";
 }
 
+function categoryOptions() {
+    return `
+        <option value="">Select Category</option>
+        <option>Public</option>
+        <option>Residential</option>
+        <option>Academic</option>
+        <option>Confidential</option>
+        <option>Emergency</option>
+    `;
+}
+
+function addContactRow(prefill = {}) {
+    const div = document.createElement("div");
+    div.className = "contact-row";
+    div.style.border = "1px solid #ddd";
+    div.style.padding = "10px";
+    div.style.marginTop = "10px";
+    div.innerHTML = `
+        <label>Contact Type</label>
+        <select class="contact_type" required>
+            <option value="">Select Type</option>
+            <option value="Mobile">Mobile</option>
+            <option value="Personal Email">Personal Email</option>
+            <option value="Landline">Landline</option>
+            <option value="Official Email">Official Email</option>
+        </select>
+        <label>Contact Value</label>
+        <input type="text" class="contact_value" required>
+        <label>Category</label>
+        <select class="contact_category" required>${categoryOptions()}</select>
+        <button type="button" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    document.getElementById("contactsContainer").appendChild(div);
+    if (prefill.contact_type) div.querySelector(".contact_type").value = prefill.contact_type;
+    if (prefill.contact_value) div.querySelector(".contact_value").value = prefill.contact_value;
+    if (prefill.category_name) div.querySelector(".contact_category").value = prefill.category_name;
+}
+
+function addLocationRow(prefill = {}) {
+    const div = document.createElement("div");
+    div.className = "location-row";
+    div.style.border = "1px solid #ddd";
+    div.style.padding = "10px";
+    div.style.marginTop = "10px";
+    div.innerHTML = `
+        <label>Location Type</label>
+        <select class="location_type" required>
+            <option value="">Select Type</option>
+            <option>Office</option>
+            <option>Hostel Room</option>
+            <option>Lab</option>
+            <option>Residence</option>
+            <option>Post</option>
+        </select>
+        <label>Building Name</label>
+        <input type="text" class="building_name" required>
+        <label>Room Number</label>
+        <input type="text" class="room_number" required>
+        <label>Category</label>
+        <select class="location_category" required>${categoryOptions()}</select>
+        <button type="button" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    document.getElementById("locationsContainer").appendChild(div);
+    if (prefill.location_type) div.querySelector(".location_type").value = prefill.location_type;
+    if (prefill.building_name) div.querySelector(".building_name").value = prefill.building_name;
+    if (prefill.room_number) div.querySelector(".room_number").value = prefill.room_number;
+    if (prefill.category_name) div.querySelector(".location_category").value = prefill.category_name;
+}
+
+function addEmergencyRow(prefill = {}) {
+    const div = document.createElement("div");
+    div.className = "emergency-row";
+    div.style.border = "1px solid #ddd";
+    div.style.padding = "10px";
+    div.style.marginTop = "10px";
+    div.innerHTML = `
+        <label>Person Name</label>
+        <input type="text" class="emergency_name" required>
+        <label>Relation</label>
+        <input type="text" class="relation" required>
+        <label>Contact Number</label>
+        <input type="text" class="emergency_phone" required>
+        <label>Category</label>
+        <select class="emergency_category" required>${categoryOptions()}</select>
+        <button type="button" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    document.getElementById("emergencyContainer").appendChild(div);
+    if (prefill.contact_person_name) div.querySelector(".emergency_name").value = prefill.contact_person_name;
+    if (prefill.relation) div.querySelector(".relation").value = prefill.relation;
+    if (prefill.emergency_phone) div.querySelector(".emergency_phone").value = prefill.emergency_phone;
+    if (prefill.category_name) div.querySelector(".emergency_category").value = prefill.category_name;
+}
+
+function collectContacts() {
+    return Array.from(document.querySelectorAll("#contactsContainer .contact-row")).map(row => ({
+        contact_type: row.querySelector(".contact_type").value,
+        contact_value: row.querySelector(".contact_value").value,
+        category_name: row.querySelector(".contact_category").value
+    }));
+}
+
+function collectLocations() {
+    return Array.from(document.querySelectorAll("#locationsContainer .location-row")).map(row => ({
+        location_type: row.querySelector(".location_type").value,
+        building_name: row.querySelector(".building_name").value,
+        room_number: row.querySelector(".room_number").value,
+        category_name: row.querySelector(".location_category").value
+    }));
+}
+
+function collectEmergencyContacts() {
+    return Array.from(document.querySelectorAll("#emergencyContainer .emergency-row")).map(row => ({
+        contact_person_name: row.querySelector(".emergency_name").value,
+        relation: row.querySelector(".relation").value,
+        emergency_phone: row.querySelector(".emergency_phone").value,
+        category_name: row.querySelector(".emergency_category").value
+    }));
+}
+
+// Start with one row in each section.
+addContactRow();
+addLocationRow();
+addEmergencyRow();
+
 document.getElementById("createForm").addEventListener("submit", function(e){
 
 e.preventDefault()
 
 const formData = {
-    category_name: document.getElementById("category_name").value,
     role_title: document.getElementById("role_title").value,
     full_name: document.getElementById("full_name").value,
     designation: document.getElementById("designation").value,
@@ -175,14 +423,9 @@ const formData = {
     gender: document.getElementById("gender").value,
     join_date: document.getElementById("join_date").value,
     assign_date: document.getElementById("assign_date").value || null,
-    contact_type: document.getElementById("contact_type").value,
-    contact_value: document.getElementById("contact_value").value,
-    location_type: document.getElementById("location_type").value,
-    building_name: document.getElementById("building_name").value,
-    room_number: document.getElementById("room_number").value,
-    emergency_name: document.getElementById("emergency_name").value,
-    relation: document.getElementById("relation").value,
-    emergency_contact: document.getElementById("emergency_contact").value,
+    contacts: collectContacts(),
+    locations: collectLocations(),
+    emergency_contacts: collectEmergencyContacts(),
     username: document.getElementById("username").value,
     password: document.getElementById("password").value
 }

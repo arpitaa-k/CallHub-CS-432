@@ -7,15 +7,56 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     <style>
+        .page-shell {
+            max-width: 1240px;
+            margin: 0 auto 28px;
+            padding: 0 8px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 18px;
+            box-shadow: 0 14px 30px rgba(2, 8, 23, 0.12);
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
         .top-bar {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0;
+            flex-wrap: wrap;
         }
 
         input, select, button {
-            padding: 8px;
-            margin: 5px;
+            padding: 10px;
+            margin: 0;
+        }
+
+        #search {
+            min-width: 260px;
+        }
+
+        #role {
+            min-width: 190px;
+        }
+
+        .actions-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .table-panel {
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 18px;
+            box-shadow: 0 14px 30px rgba(2, 8, 23, 0.12);
+            overflow: hidden;
         }
 
         table {
@@ -26,6 +67,21 @@
         th, td {
             padding: 10px;
             text-align: center;
+            color: #0f172a;
+        }
+
+        th {
+            background: #f1f5f9;
+            font-weight: 800;
+        }
+
+        #portfolio-details {
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            box-shadow: 0 14px 30px rgba(2, 8, 23, 0.12);
+            padding: 16px;
+            margin-top: 14px !important;
         }
     </style>
 </head>
@@ -34,7 +90,10 @@
 
 <h2>Members List</h2>
 
+<div class="page-shell">
+
 <!-- 🔹 Search Section -->
+<div class="panel">
 <div class="top-bar">
 
     <!-- LEFT: Name Search -->
@@ -44,7 +103,7 @@
     </div>
 
     <!-- RIGHT: Role Dropdown -->
-    <div>
+    <div class="actions-right">
         <select id="role">
             <option value="">Select Role</option>
             <option>Director</option>
@@ -65,8 +124,10 @@
     </div>
 
 </div>
+</div>
 
 <!-- 🔹 Table -->
+<div class="table-panel">
 <table border="1" id="membersTable">
 
 <tr>
@@ -77,8 +138,11 @@
 </tr>
 
 </table>
+</div>
 
 <div id="portfolio-details" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px; display:none;"></div>
+
+</div>
 
 <!-- 🔹 Script -->
 <script>

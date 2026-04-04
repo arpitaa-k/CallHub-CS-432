@@ -14,6 +14,36 @@ def _ensure_logs_dir():
     return logs_dir
 
 
+def _append_log(filename, line):
+    try:
+        logs_dir = _ensure_logs_dir()
+        logfile = os.path.join(logs_dir, filename)
+        with open(logfile, 'a', encoding='utf-8') as f:
+            f.write(line + "\n")
+    except Exception:
+        pass
+
+
+def _touch_log(filename):
+    try:
+        logs_dir = _ensure_logs_dir()
+        logfile = os.path.join(logs_dir, filename)
+        with open(logfile, 'a', encoding='utf-8'):
+            pass
+    except Exception:
+        pass
+
+
+def log_login_event(username, status, member_id=None, reason=None, ip=None, user_agent=None, jti=None):
+    """Append login/logout/security events to logs/login_audit.log."""
+    timestamp = datetime.utcnow().isoformat() + 'Z'
+    line = (
+        f"{timestamp}\tstatus={status}\tusername={username}\tmember_id={member_id}"
+        f"\treason={reason or ''}\tip={ip or ''}\tjti={jti or ''}\tua={user_agent or ''}"
+    )
+    _append_log('login_audit.log', line)
+
+
 def log_action(actor_id, table, record_id, action, source='API'):
     """Log action into Audit_Trail table and append a human-readable copy to logs/audit.log.
 
@@ -21,7 +51,16 @@ def log_action(actor_id, table, record_id, action, source='API'):
     the application (`'API'`) or was produced by a DB trigger/other source (`'DB'`).
     """
 
-    cur = mysql.connection.cursor()
+    timestamp = datetime.utcnow().isoformat() + 'Z'
+    line = f"{timestamp}\tactor={actor_id}\ttable={table}\trecord={record_id}\taction={action}\tsource={source}"
+
+    # Keep only the audit copy for human-readable logs.
+    _append_log('audit.log', line)
+
+    try:
+        cur = mysql.connection.cursor()
+    except Exception:
+        return
 
     # no-op if already present.
     try:
@@ -54,13 +93,8 @@ def log_action(actor_id, table, record_id, action, source='API'):
             # give up silently to avoid breaking API flow;
             print("Failed to write Audit_Trail entry")
 
-    # Append human-readable log to file
-    try:
-        logs_dir = _ensure_logs_dir()
-        logfile = os.path.join(logs_dir, 'audit.log')
-        timestamp = datetime.utcnow().isoformat() + 'Z'
-        with open(logfile, 'a', encoding='utf-8') as f:
-            f.write(f"{timestamp}\tactor={actor_id}\ttable={table}\trecord={record_id}\taction={action}\tsource={source}\n")
-    except Exception:
-        # don't let file logging break application
-        pass
+
+
+# Ensure expected log files exist even before first event is written.
+_touch_log('login_audit.log')
+_touch_log('audit.log')

@@ -7,3 +7,4 @@ matplotlib
 flask_mysqldb
 bcrypt
 locust
+PyJWT

@@ -444,3 +444,180 @@ table, th, td
     border: 1px solid gray;
     padding: 10px;
 }
+
+/* Unified non-login theme (blue-black palette) */
+body:not(.login-page) {
+    --theme-bg-a: #0f172a;
+    --theme-bg-b: #111827;
+    --theme-panel: #ffffff;
+    --theme-soft: #f8fafc;
+    --theme-line: #dbe3ee;
+    --theme-text: #0b1220;
+    --theme-muted: #516074;
+    --theme-accent: #0ea5a6;
+    --theme-accent-2: #0891b2;
+    --theme-danger: #dc2626;
+    --theme-shadow: 0 20px 45px rgba(2, 8, 23, 0.2);
+
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Manrope', 'Segoe UI', sans-serif;
+    color: var(--theme-text);
+    background:
+        radial-gradient(circle at 12% 20%, rgba(14, 165, 166, 0.16), transparent 32%),
+        radial-gradient(circle at 86% 12%, rgba(59, 130, 246, 0.18), transparent 34%),
+        linear-gradient(135deg, var(--theme-bg-a), var(--theme-bg-b));
+}
+
+body:not(.login-page) .header {
+    background: rgba(15, 23, 42, 0.82);
+    backdrop-filter: blur(3px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body:not(.login-page) .content,
+body:not(.login-page) .container,
+body:not(.login-page) #searchScreenDiv,
+body:not(.login-page) #confirmationDiv,
+body:not(.login-page) #portfolio-data,
+body:not(.login-page) .table-container {
+    background: var(--theme-panel);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 18px;
+    box-shadow: var(--theme-shadow);
+}
+
+body:not(.login-page) .container {
+    width: min(980px, 92vw);
+}
+
+body:not(.login-page) > h1,
+body:not(.login-page) > h2,
+body:not(.login-page) > h3,
+body:not(.login-page) > h4 {
+    color: #e2e8f0;
+}
+
+/* Standard top spacing for plain page headings like Delete/Read screens */
+body:not(.login-page) > h2 {
+    max-width: 980px;
+    margin: 26px auto 14px;
+    padding: 0 6px;
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    font-weight: 800;
+}
+
+body:not(.login-page) .content h1,
+body:not(.login-page) .content h2,
+body:not(.login-page) .content h3,
+body:not(.login-page) .content h4,
+body:not(.login-page) .container h1,
+body:not(.login-page) .container h2,
+body:not(.login-page) .container h3,
+body:not(.login-page) .container h4,
+body:not(.login-page) .panel h1,
+body:not(.login-page) .panel h2,
+body:not(.login-page) .panel h3,
+body:not(.login-page) .panel h4,
+body:not(.login-page) .table-panel h1,
+body:not(.login-page) .table-panel h2,
+body:not(.login-page) .table-panel h3,
+body:not(.login-page) .table-panel h4,
+body:not(.login-page) #portfolio-details h1,
+body:not(.login-page) #portfolio-details h2,
+body:not(.login-page) #portfolio-details h3,
+body:not(.login-page) #portfolio-details h4,
+body:not(.login-page) .role-selection h1,
+body:not(.login-page) .role-selection h2,
+body:not(.login-page) .role-selection h3,
+body:not(.login-page) .role-selection h4,
+body:not(.login-page) #searchScreenDiv h1,
+body:not(.login-page) #searchScreenDiv h2,
+body:not(.login-page) #searchScreenDiv h3,
+body:not(.login-page) #searchScreenDiv h4,
+body:not(.login-page) #confirmationDiv h1,
+body:not(.login-page) #confirmationDiv h2,
+body:not(.login-page) #confirmationDiv h3,
+body:not(.login-page) #confirmationDiv h4,
+body:not(.login-page) .actions-panel h1,
+body:not(.login-page) .actions-panel h2,
+body:not(.login-page) .actions-panel h3,
+body:not(.login-page) .actions-panel h4,
+body:not(.login-page) .modal-content h1,
+body:not(.login-page) .modal-content h2,
+body:not(.login-page) .modal-content h3,
+body:not(.login-page) .modal-content h4,
+body:not(.login-page) .modal-content .modal-title {
+    color: var(--theme-text);
+}
+
+body:not(.login-page) .container h1,
+body:not(.login-page) .container h2,
+body:not(.login-page) .container h3,
+body:not(.login-page) .container h4,
+body:not(.login-page) #portfolio-data h1,
+body:not(.login-page) #portfolio-data h2,
+body:not(.login-page) #portfolio-data h3,
+body:not(.login-page) #portfolio-data h4,
+body:not(.login-page) .content h1,
+body:not(.login-page) .content h2,
+body:not(.login-page) .content h3,
+body:not(.login-page) .content h4 {
+    color: var(--theme-text);
+}
+
+body:not(.login-page) p,
+body:not(.login-page) li,
+body:not(.login-page) td,
+body:not(.login-page) th {
+    color: var(--theme-text);
+}
+
+body:not(.login-page) input,
+body:not(.login-page) select {
+    background: var(--theme-soft);
+    border: 1px solid var(--theme-line);
+    border-radius: 10px;
+}
+
+body:not(.login-page) input:focus,
+body:not(.login-page) select:focus {
+    outline: none;
+    border-color: #22d3ee;
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
+}
+
+body:not(.login-page) button,
+body:not(.login-page) .action-btn,
+body:not(.login-page) .crud-box,
+body:not(.login-page) .modal-btn.confirm,
+body:not(.login-page) .logout-btn,
+body:not(.login-page) .logout-btn-red {
+    background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-2));
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+}
+
+body:not(.login-page) .action-btn:hover,
+body:not(.login-page) .crud-box:hover,
+body:not(.login-page) button:hover,
+body:not(.login-page) .modal-btn.confirm:hover,
+body:not(.login-page) .logout-btn:hover,
+body:not(.login-page) .logout-btn-red:hover {
+    filter: brightness(1.06);
+}
+
+body:not(.login-page) .modal-btn.cancel {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+body:not(.login-page) .footer {
+    background: rgba(15, 23, 42, 0.82);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body:not(.login-page) .suggestion-item:hover {
+    background: #ecfeff;
+}

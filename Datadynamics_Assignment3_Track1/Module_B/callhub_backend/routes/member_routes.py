@@ -7,6 +7,59 @@ import bcrypt
 
 members = Blueprint("members", __name__)
 
+
+def _normalize_detail_entries(data):
+    """Normalize legacy single-entry payload into multi-entry lists.
+
+    New payload shape supports:
+    - contacts: [{contact_type, contact_value, category_name}]
+    - locations: [{location_type, building_name, room_number, category_name}]
+    - emergency_contacts: [{contact_person_name, relation, emergency_phone, category_name}]
+    """
+    default_category = data.get("category_name")
+
+    contacts = data.get("contacts")
+    if not isinstance(contacts, list):
+        contacts = []
+        if data.get("contact_type") and data.get("contact_value"):
+            contacts.append({
+                "contact_type": data.get("contact_type"),
+                "contact_value": data.get("contact_value"),
+                "category_name": data.get("contact_category_name") or default_category,
+            })
+
+    locations = data.get("locations")
+    if not isinstance(locations, list):
+        locations = []
+        if data.get("location_type") and data.get("building_name") and data.get("room_number"):
+            locations.append({
+                "location_type": data.get("location_type"),
+                "building_name": data.get("building_name"),
+                "room_number": data.get("room_number"),
+                "category_name": data.get("location_category_name") or default_category,
+            })
+
+    emergency_contacts = data.get("emergency_contacts")
+    if not isinstance(emergency_contacts, list):
+        emergency_contacts = []
+        if data.get("emergency_name") and data.get("relation") and data.get("emergency_contact"):
+            emergency_contacts.append({
+                "contact_person_name": data.get("emergency_name"),
+                "relation": data.get("relation"),
+                "emergency_phone": data.get("emergency_contact"),
+                "category_name": data.get("emergency_category_name") or default_category,
+            })
+
+    return contacts, locations, emergency_contacts
+
+
+def _category_id(cur, category_name):
+    if not category_name:
+        return None
+    cur.execute("SELECT category_id FROM Data_Categories WHERE category_name = %s", (category_name,))
+    row = cur.fetchone()
+    return row[0] if row else None
+
 # Get editable roles for current user
 
 @members.route("/editable-roles", methods=["GET"])
@@ -115,9 +168,6 @@ def create_member():
     # Department (for new member only) - removed from UI; default to 1 if not provided
     dept_id = data.get("dept_id") or 1
 
-    # Category
-    category_name = data.get("category_name")
-
     # Role
     role_title = data.get("role_title")
 
@@ -129,19 +179,7 @@ def create_member():
     join_date = data.get("join_date")
     assign_date = data.get("assign_date")
 
-    # Contact
-    contact_type = data.get("contact_type")
-    contact_value = data["contact_value"]
-
-    # Location
-    location_type = data.get("location_type")
-    building_name = data.get("building_name")
-    room_number = data.get("room_number")
-
-    # Emergency
-    emergency_name = data.get("emergency_name")
-    relation = data.get("relation")
-    emergency_contact = data.get("emergency_contact")
+    contacts, locations, emergency_contacts = _normalize_detail_entries(data)
 
     # Credentials
     username = data.get("username")
@@ -150,19 +188,19 @@ def create_member():
     cur = mysql.connection.cursor()
 
     try:
-        # Get category_id
-        cur.execute("SELECT category_id FROM Data_Categories WHERE category_name = %s", (category_name,))
-        category = cur.fetchone()
-        if not category:
-            return {"error": "Invalid category"}, 400
-        category_id = category[0]
-
         # Get role_id
         cur.execute("SELECT role_id FROM Roles WHERE role_title = %s", (role_title,))
         role_row = cur.fetchone()
         if not role_row:
             return {"error": "Invalid role"}, 400
         role_id = role_row[0]
+
+        if not contacts:
+            return {"error": "At least one contact detail is required"}, 400
+        if not locations:
+            return {"error": "At least one location detail is required"}, 400
+        if not emergency_contacts:
+            return {"error": "At least one emergency contact is required"}, 400
 
         # Insert Member
         cur.execute("""
@@ -172,23 +210,35 @@ def create_member():
 
         new_member_id = cur.lastrowid
 
-        # Insert Contact_Details
-        cur.execute("""
-            INSERT INTO Contact_Details (member_id, contact_type, contact_value, category_id)
-            VALUES (%s, %s, %s, %s)
-        """, (new_member_id, contact_type, contact_value, category_id))
+        # Insert Contact_Details (multi-entry)
+        for c in contacts:
+            cat_id = _category_id(cur, c.get("category_name"))
+            if not cat_id:
+                return {"error": f"Invalid contact category: {c.get('category_name')}"}, 400
+            cur.execute("""
+                INSERT INTO Contact_Details (member_id, contact_type, contact_value, category_id)
+                VALUES (%s, %s, %s, %s)
+            """, (new_member_id, c.get("contact_type"), c.get("contact_value"), cat_id))
 
-        # Insert Locations
-        cur.execute("""
-            INSERT INTO Locations (member_id, location_type, building_name, room_number, category_id)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (new_member_id, location_type, building_name, room_number, category_id))
+        # Insert Locations (multi-entry)
+        for l in locations:
+            cat_id = _category_id(cur, l.get("category_name"))
+            if not cat_id:
+                return {"error": f"Invalid location category: {l.get('category_name')}"}, 400
+            cur.execute("""
+                INSERT INTO Locations (member_id, location_type, building_name, room_number, category_id)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (new_member_id, l.get("location_type"), l.get("building_name"), l.get("room_number"), cat_id))
 
-        # Insert Emergency_Contacts
-        cur.execute("""
-            INSERT INTO Emergency_Contacts (member_id, contact_person_name, relation, emergency_phone, category_id)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (new_member_id, emergency_name, relation, emergency_contact, category_id))
+        # Insert Emergency_Contacts (multi-entry)
+        for e in emergency_contacts:
+            cat_id = _category_id(cur, e.get("category_name"))
+            if not cat_id:
+                return {"error": f"Invalid emergency category: {e.get('category_name')}"}, 400
+            cur.execute("""
+                INSERT INTO Emergency_Contacts (member_id, contact_person_name, relation, emergency_phone, category_id)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (new_member_id, e.get("contact_person_name"), e.get("relation"), e.get("emergency_phone"), cat_id))
 
         # Insert User_Credentials
         hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
@@ -310,6 +360,23 @@ def get_member(id):
                 category = cur.fetchone()
                 data["category_name"] = category[0] if category and category[0] else ""
 
+        # Also return full multi-entry details for advanced create/update forms.
+        cur.execute("""
+            SELECT cd.contact_type, cd.contact_value, dc.category_name
+            FROM Contact_Details cd
+            JOIN Data_Categories dc ON cd.category_id = dc.category_id
+            WHERE cd.member_id = %s
+            ORDER BY cd.contact_id
+        """, (id,))
+        data["contacts"] = [
+            {
+                "contact_type": row[0],
+                "contact_value": row[1],
+                "category_name": row[2],
+            }
+            for row in cur.fetchall()
+        ]
+
         # Get first location (if exists)
         cur.execute("""
             SELECT location_type, building_name, room_number 
@@ -323,6 +390,23 @@ def get_member(id):
             data["building_name"] = location[1] if location[1] else ""
             data["room_number"] = location[2] if location[2] else ""
 
+        cur.execute("""
+            SELECT l.location_type, l.building_name, l.room_number, dc.category_name
+            FROM Locations l
+            JOIN Data_Categories dc ON l.category_id = dc.category_id
+            WHERE l.member_id = %s
+            ORDER BY l.location_id
+        """, (id,))
+        data["locations"] = [
+            {
+                "location_type": row[0],
+                "building_name": row[1],
+                "room_number": row[2],
+                "category_name": row[3],
+            }
+            for row in cur.fetchall()
+        ]
+
         # Get first emergency contact (if exists)
         cur.execute("""
             SELECT contact_person_name, relation, emergency_phone 
@@ -335,6 +419,23 @@ def get_member(id):
             data["emergency_name"] = emergency[0] if emergency[0] else ""
             data["relation"] = emergency[1] if emergency[1] else ""
             data["emergency_contact"] = emergency[2] if emergency[2] else ""
+
+        cur.execute("""
+            SELECT ec.contact_person_name, ec.relation, ec.emergency_phone, dc.category_name
+            FROM Emergency_Contacts ec
+            JOIN Data_Categories dc ON ec.category_id = dc.category_id
+            WHERE ec.member_id = %s
+            ORDER BY ec.record_id
+        """, (id,))
+        data["emergency_contacts"] = [
+            {
+                "contact_person_name": row[0],
+                "relation": row[1],
+                "emergency_phone": row[2],
+                "category_name": row[3],
+            }
+            for row in cur.fetchall()
+        ]
 
         # Get username (if exists)
         cur.execute("""
@@ -394,14 +495,7 @@ def update_member(id):
 
     data = request.json
 
-    # Similar to create, but update
-    # For simplicity, update all fields
-
     dept_id = data.get("dept_id")
-    dept_code = data.get("dept_code")
-    dept_name = data.get("dept_name")
-    building_location = data.get("building_location")
-    category_name = data.get("category_name")
     role_title = data.get("role_title")
     full_name = data.get("full_name")
     designation = data.get("designation")
@@ -409,14 +503,7 @@ def update_member(id):
     gender = data.get("gender")
     join_date = data.get("join_date")
     assign_date = data.get("assign_date")
-    contact_type = data.get("contact_type")
-    contact_value = data.get("contact_value")
-    location_type = data.get("location_type")
-    building_name = data.get("building_name")
-    room_number = data.get("room_number")
-    emergency_name = data.get("emergency_name")
-    relation = data.get("relation")
-    emergency_contact = data.get("emergency_contact")
+    contacts, locations, emergency_contacts = _normalize_detail_entries(data)
     username = data.get("username")
     password = data.get("password")
 
@@ -429,14 +516,7 @@ def update_member(id):
         if not existing:
             return {"error": "Member not found or already deleted"}, 404
 
-        category_id = None
         role_id = None
-
-        # Get category_id
-        if category_name:
-            cur.execute("SELECT category_id FROM Data_Categories WHERE category_name = %s", (category_name,))
-            category = cur.fetchone()
-            category_id = category[0] if category else None
 
         # Get role_id
         if role_title:
@@ -455,23 +535,42 @@ def update_member(id):
             mysql.connection.rollback()
             return {"error": "Member not found or already deleted"}, 404
 
-        # Update Contact_Details
-        if category_id:
-            cur.execute("""
-                UPDATE Contact_Details SET contact_type=%s, contact_value=%s, category_id=%s WHERE member_id=%s
-            """, (contact_type, contact_value, category_id, id))
+        # Replace detail rows with the new payload (supports add/edit/delete of multiple details).
+        if contacts:
+            cur.execute("DELETE FROM Contact_Details WHERE member_id=%s", (id,))
+            for c in contacts:
+                cat_id = _category_id(cur, c.get("category_name"))
+                if not cat_id:
+                    mysql.connection.rollback()
+                    return {"error": f"Invalid contact category: {c.get('category_name')}"}, 400
+                cur.execute("""
+                    INSERT INTO Contact_Details (member_id, contact_type, contact_value, category_id)
+                    VALUES (%s, %s, %s, %s)
+                """, (id, c.get("contact_type"), c.get("contact_value"), cat_id))
 
-        # Update Locations
-        if category_id:
-            cur.execute("""
-                UPDATE Locations SET location_type=%s, building_name=%s, room_number=%s, category_id=%s WHERE member_id=%s
-            """, (location_type, building_name, room_number, category_id, id))
+        if locations:
+            cur.execute("DELETE FROM Locations WHERE member_id=%s", (id,))
+            for l in locations:
+                cat_id = _category_id(cur, l.get("category_name"))
+                if not cat_id:
+                    mysql.connection.rollback()
+                    return {"error": f"Invalid location category: {l.get('category_name')}"}, 400
+                cur.execute("""
+                    INSERT INTO Locations (member_id, location_type, building_name, room_number, category_id)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (id, l.get("location_type"), l.get("building_name"), l.get("room_number"), cat_id))
 
-        # Update Emergency_Contacts
-        if category_id:
-            cur.execute("""
-                UPDATE Emergency_Contacts SET contact_person_name=%s, relation=%s, emergency_phone=%s, category_id=%s WHERE member_id=%s
-            """, (emergency_name, relation, emergency_contact, category_id, id))
+        if emergency_contacts:
+            cur.execute("DELETE FROM Emergency_Contacts WHERE member_id=%s", (id,))
+            for e in emergency_contacts:
+                cat_id = _category_id(cur, e.get("category_name"))
+                if not cat_id:
+                    mysql.connection.rollback()
+                    return {"error": f"Invalid emergency category: {e.get('category_name')}"}, 400
+                cur.execute("""
+                    INSERT INTO Emergency_Contacts (member_id, contact_person_name, relation, emergency_phone, category_id)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (id, e.get("contact_person_name"), e.get("relation"), e.get("emergency_phone"), cat_id))
 
         # Update User_Credentials
         if password:

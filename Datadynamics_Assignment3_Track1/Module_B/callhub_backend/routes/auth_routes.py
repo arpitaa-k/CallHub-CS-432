@@ -2,6 +2,9 @@ from flask import Blueprint, request, jsonify, session, redirect
 from db import mysql
 from MySQLdb import IntegrityError
 import bcrypt
+import uuid
+from utils.auth import generate_jwt
+from utils.logger import log_login_event
 
 auth = Blueprint("auth", __name__)
 
@@ -11,9 +14,19 @@ def login():
     # Clear any existing session
     session.clear()
 
-    data = request.json
-    username = data["username"]
-    password = data["password"]
+    data = request.json or {}
+    username = data.get("username", "")
+    password = data.get("password", "")
+
+    if not username or not password:
+        log_login_event(
+            username=username or "<missing>",
+            status="LOGIN_FAIL",
+            reason="missing_credentials",
+            ip=request.remote_addr,
+            user_agent=request.headers.get("User-Agent"),
+        )
+        return jsonify({"error": "Username and password required"}), 400
 
     cur = mysql.connection.cursor()
 
@@ -26,6 +39,13 @@ def login():
     user = cur.fetchone()
 
     if not user:
+        log_login_event(
+            username=username,
+            status="LOGIN_FAIL",
+            reason="invalid_username",
+            ip=request.remote_addr,
+            user_agent=request.headers.get("User-Agent"),
+        )
         return jsonify({"error":"Invalid username"}),401
 
     user_id, member_id, password_hash = user
@@ -46,14 +66,40 @@ def login():
         """, (member_id,))
 
         role = cur.fetchone()
+        role_title = None
         if role:
-            session["role"] = role[0]
+            role_title = role[0]
+            session["role"] = role_title
+
+        jti = str(uuid.uuid4())
+        session["jwt_jti"] = jti
+        token = generate_jwt(user_id=user_id, member_id=member_id, role=role_title, jti=jti)
+
+        log_login_event(
+            username=username,
+            status="LOGIN_SUCCESS",
+            member_id=member_id,
+            ip=request.remote_addr,
+            user_agent=request.headers.get("User-Agent"),
+            jti=jti,
+        )
 
         return jsonify({
             "message":"Login successful",
-            "member_id":member_id
+            "member_id":member_id,
+            "token": token,
+            "token_type": "Bearer",
+            "expires_in_sec": 30 * 60,
         })
 
+    log_login_event(
+        username=username,
+        status="LOGIN_FAIL",
+        member_id=member_id,
+        reason="invalid_password",
+        ip=request.remote_addr,
+        user_agent=request.headers.get("User-Agent"),
+    )
     return jsonify({"error":"Invalid password"}),401
 
 
@@ -108,7 +154,14 @@ def register():
 
 @auth.route("/logout")
 def logout():
-
+    log_login_event(
+        username=session.get("member_id") or "<unknown>",
+        status="LOGOUT",
+        member_id=session.get("member_id"),
+        ip=request.remote_addr,
+        user_agent=request.headers.get("User-Agent"),
+        jti=session.get("jwt_jti"),
+    )
     session.clear()
 
     return redirect("/")

@@ -270,6 +270,11 @@
 let selectedRole = "";
 let selectedMemberId = "";
 let suggestionTimer;
+let originalMemberData = null;
+
+function stableStringify(value) {
+    return JSON.stringify(value ?? null);
+}
 
 function categoryOptions() {
     return `
@@ -573,6 +578,20 @@ function selectMember(memberId) {
             });
         }
         document.getElementById("username").value = data.username || "";
+
+        originalMemberData = {
+            role_title: data.role_title || "",
+            full_name: data.full_name || "",
+            designation: data.designation || "",
+            age: data.age === null || data.age === undefined ? "" : String(data.age),
+            gender: data.gender || "",
+            join_date: data.join_date || "",
+            assign_date: data.assign_date || null,
+            contacts: Array.isArray(data.contacts) ? data.contacts : [],
+            locations: Array.isArray(data.locations) ? data.locations : [],
+            emergency_contacts: Array.isArray(data.emergency_contacts) ? data.emergency_contacts : [],
+            username: data.username || "",
+        };
         
         document.getElementById("searchScreenDiv").style.display = "none";
         document.getElementById("updateForm").style.display = "block";
@@ -587,7 +606,7 @@ document.getElementById("updateForm").addEventListener("submit", function(e){
 
 e.preventDefault()
 
-const formData = {
+const currentData = {
     role_title: document.getElementById("role_title").value,
     full_name: document.getElementById("full_name").value,
     designation: document.getElementById("designation").value,
@@ -600,6 +619,27 @@ const formData = {
     emergency_contacts: collectEmergencyContacts(),
     username: document.getElementById("username").value,
     password: document.getElementById("password").value || null
+};
+
+const formData = {};
+const baseline = originalMemberData || {};
+
+if (currentData.role_title !== (baseline.role_title || "")) formData.role_title = currentData.role_title;
+if (currentData.full_name !== (baseline.full_name || "")) formData.full_name = currentData.full_name;
+if (currentData.designation !== (baseline.designation || "")) formData.designation = currentData.designation;
+if (currentData.age !== (baseline.age || "")) formData.age = currentData.age;
+if (currentData.gender !== (baseline.gender || "")) formData.gender = currentData.gender;
+if (currentData.join_date !== (baseline.join_date || "")) formData.join_date = currentData.join_date;
+if ((currentData.assign_date || null) !== (baseline.assign_date || null)) formData.assign_date = currentData.assign_date;
+if (stableStringify(currentData.contacts) !== stableStringify(baseline.contacts)) formData.contacts = currentData.contacts;
+if (stableStringify(currentData.locations) !== stableStringify(baseline.locations)) formData.locations = currentData.locations;
+if (stableStringify(currentData.emergency_contacts) !== stableStringify(baseline.emergency_contacts)) formData.emergency_contacts = currentData.emergency_contacts;
+if (currentData.username !== (baseline.username || "")) formData.username = currentData.username;
+if (currentData.password) formData.password = currentData.password;
+
+if (Object.keys(formData).length === 0) {
+    alert("No changes detected.");
+    return;
 }
 
 fetch(`/members/${selectedMemberId}`, {
@@ -618,6 +658,7 @@ window.location.href="/success"
 alert(data.error)
 }
 })
+
 })
 </script>
 

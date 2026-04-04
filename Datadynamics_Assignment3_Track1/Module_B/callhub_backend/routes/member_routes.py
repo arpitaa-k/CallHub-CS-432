@@ -503,7 +503,6 @@ def update_member(id):
     gender = data.get("gender")
     join_date = data.get("join_date")
     assign_date = data.get("assign_date")
-    contacts, locations, emergency_contacts = _normalize_detail_entries(data)
     username = data.get("username")
     password = data.get("password")
 
@@ -511,10 +510,26 @@ def update_member(id):
 
     try:
         # Lock active target row to avoid update/delete race on the same member.
-        cur.execute("SELECT member_id FROM Members WHERE member_id=%s AND is_deleted=0 FOR UPDATE", (id,))
+        cur.execute(
+            """
+            SELECT member_id, full_name, designation, age, gender, join_date
+            FROM Members
+            WHERE member_id=%s AND is_deleted=0
+            FOR UPDATE
+            """,
+            (id,),
+        )
         existing = cur.fetchone()
         if not existing:
             return {"error": "Member not found or already deleted"}, 404
+
+        existing_member = {
+            "full_name": existing[1],
+            "designation": existing[2],
+            "age": existing[3],
+            "gender": existing[4],
+            "join_date": existing[5],
+        }
 
         role_id = None
 
@@ -522,21 +537,46 @@ def update_member(id):
         if role_title:
             cur.execute("SELECT role_id FROM Roles WHERE role_title = %s", (role_title,))
             role_row = cur.fetchone()
-            role_id = role_row[0] if role_row else None
+            if not role_row:
+                mysql.connection.rollback()
+                return {"error": "Invalid role"}, 400
+            role_id = role_row[0]
+
+        # Partial update support: keep existing values for omitted fields.
+        next_full_name = full_name if full_name is not None else existing_member["full_name"]
+        next_designation = designation if designation is not None else existing_member["designation"]
+        next_age = age if age is not None else existing_member["age"]
+        next_gender = gender if gender is not None else existing_member["gender"]
+        next_join_date = join_date if join_date is not None else existing_member["join_date"]
 
         # Update Member
         cur.execute("""
             UPDATE Members
             SET full_name=%s, designation=%s, age=%s, gender=%s, join_date=%s
             WHERE member_id=%s AND is_deleted=0
-        """, (full_name, designation, age, gender, join_date, id))
+        """, (next_full_name, next_designation, next_age, next_gender, next_join_date, id))
 
-        if cur.rowcount == 0:
-            mysql.connection.rollback()
-            return {"error": "Member not found or already deleted"}, 404
+        # Replace detail rows only when the respective section is provided.
+        contacts_provided = isinstance(data.get("contacts"), list) or (
+            data.get("contact_type") is not None or data.get("contact_value") is not None
+        )
+        locations_provided = isinstance(data.get("locations"), list) or (
+            data.get("location_type") is not None
+            or data.get("building_name") is not None
+            or data.get("room_number") is not None
+        )
+        emergency_provided = isinstance(data.get("emergency_contacts"), list) or (
+            data.get("emergency_name") is not None
+            or data.get("relation") is not None
+            or data.get("emergency_contact") is not None
+        )
 
-        # Replace detail rows with the new payload (supports add/edit/delete of multiple details).
-        if contacts:
+        contacts, locations, emergency_contacts = _normalize_detail_entries(data)
+
+        if contacts_provided:
+            if not contacts:
+                mysql.connection.rollback()
+                return {"error": "At least one contact detail is required"}, 400
             cur.execute("DELETE FROM Contact_Details WHERE member_id=%s", (id,))
             for c in contacts:
                 cat_id = _category_id(cur, c.get("category_name"))
@@ -548,7 +588,10 @@ def update_member(id):
                     VALUES (%s, %s, %s, %s)
                 """, (id, c.get("contact_type"), c.get("contact_value"), cat_id))
 
-        if locations:
+        if locations_provided:
+            if not locations:
+                mysql.connection.rollback()
+                return {"error": "At least one location detail is required"}, 400
             cur.execute("DELETE FROM Locations WHERE member_id=%s", (id,))
             for l in locations:
                 cat_id = _category_id(cur, l.get("category_name"))
@@ -560,7 +603,10 @@ def update_member(id):
                     VALUES (%s, %s, %s, %s, %s)
                 """, (id, l.get("location_type"), l.get("building_name"), l.get("room_number"), cat_id))
 
-        if emergency_contacts:
+        if emergency_provided:
+            if not emergency_contacts:
+                mysql.connection.rollback()
+                return {"error": "At least one emergency contact is required"}, 400
             cur.execute("DELETE FROM Emergency_Contacts WHERE member_id=%s", (id,))
             for e in emergency_contacts:
                 cat_id = _category_id(cur, e.get("category_name"))
@@ -573,11 +619,20 @@ def update_member(id):
                 """, (id, e.get("contact_person_name"), e.get("relation"), e.get("emergency_phone"), cat_id))
 
         # Update User_Credentials
-        if password:
+        if username and password:
             hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
             cur.execute("""
                 UPDATE User_Credentials SET username=%s, password_hash=%s WHERE member_id=%s
             """, (username, hashed.decode(), id))
+        elif password:
+            hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+            cur.execute("""
+                UPDATE User_Credentials SET password_hash=%s WHERE member_id=%s
+            """, (hashed.decode(), id))
+        elif username:
+            cur.execute("""
+                UPDATE User_Credentials SET username=%s WHERE member_id=%s
+            """, (username, id))
 
         # Update Member_Role_Assignments (also update assigned_date when provided)
         if role_id:

@@ -400,7 +400,7 @@ def main() -> None:
     parser.add_argument("--unauth-update-every", type=int, default=10)
     parser.add_argument("--durability-delay-sec", type=int, default=3)
     parser.add_argument("--category-name", default="Public")
-    parser.add_argument("--role-title", default="Admin")
+    parser.add_argument("--role-title", default="Director")
     parser.add_argument("--include-records", action="store_true", help="Include per-request records in load_test output")
     parser.add_argument("--out-file", default="../benchmarks/stress_test_report.json")
     args = parser.parse_args()

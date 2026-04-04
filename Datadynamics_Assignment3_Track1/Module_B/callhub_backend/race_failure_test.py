@@ -367,7 +367,7 @@ def main() -> None:
     p.add_argument("--race-attempts", type=int, default=60)
     p.add_argument("--workers", type=int, default=20)
     p.add_argument("--category-name", default="Public")
-    p.add_argument("--role-title", default="Admin")
+    p.add_argument("--role-title", default="Director")
     p.add_argument("--include-records", action="store_true", help="Include per-request records in JSON report")
     p.add_argument("--out-file", default="../benchmarks/race_failure_report.json")
     args = p.parse_args()

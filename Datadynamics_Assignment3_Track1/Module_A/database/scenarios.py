@@ -373,10 +373,11 @@ class ScenarioRunner:
         Business Logic:
         - Commit some transactions
         - Leave some uncommitted (simulate crash)
-        - Execute recovery
-        - Verify committed data persists, uncommitted data is rolled back
+        - RESTART the system (clear in-memory state)
+        - Execute recovery from logs
+        - Verify committed data is REDONE, uncommitted data is UNDONE
         
-        Demonstrates: Durability and crash recovery
+        Demonstrates: Durability and crash recovery with actual restart simulation
         """
         print("\n" + "="*80)
         print("SCENARIO 5: CRASH SIMULATION & RECOVERY")
@@ -424,19 +425,43 @@ class ScenarioRunner:
         member1_before = members_table.get(601)
         member2_before = members_table.get(602)
         
-        print(f"\nBefore Recovery:")
+        print(f"\nBefore Recovery (in-memory state):")
         print(f"  - Member 601 (COMMITTED): {'EXISTS' if member1_before else 'MISSING'}")
         print(f"  - Member 602 (UNCOMMITTED): {'EXISTS' if member2_before else 'MISSING'}")
         
-        # Execute recovery
-        print(f"\nPhase 2: Executing crash recovery...")
+        # ===== SIMULATE RESTART =====
+        print(f"\nPhase 2: SIMULATING SYSTEM RESTART...")
+        print(f"  - Clearing in-memory database")
+        print(f"  - Creating fresh database and transaction manager")
+        
+        # Create completely new managers (simulates restart)
+        self.dm = DatabaseManager()
+        self.txm = TransactionManager(self.dm)
+        
+        # Reinitialize empty schema
+        initialize_module_a_schema(self.dm, self.db_name)
+        print(f"  - Schema reinitialized (fresh empty tables)")
+        
+        # Get fresh table reference
+        members_table = self.dm.get_table(self.db_name, "Members")
+        
+        # At this point, in-memory tables are empty
+        member1_after_restart = members_table.get(601)
+        member2_after_restart = members_table.get(602)
+        
+        print(f"\nAfter Restart (before recovery):")
+        print(f"  - Member 601: {'EXISTS' if member1_after_restart else 'MISSING'}")
+        print(f"  - Member 602: {'EXISTS' if member2_after_restart else 'MISSING'}")
+        
+        # Now execute recovery from logs
+        print(f"\nPhase 3: Executing crash recovery from logs...")
         recovery_stats = self.txm.recover_from_crash(self.db_name)
         
         # After recovery
         member1_after = members_table.get(601)
         member2_after = members_table.get(602)
         
-        print(f"\nAfter Recovery:")
+        print(f"\nAfter Recovery (from logs):")
         print(f"  - Member 601 (COMMITTED): {'EXISTS' if member1_after else 'MISSING'}")
         print(f"  - Member 602 (UNCOMMITTED): {'EXISTS' if member2_after else 'MISSING'}")
         
@@ -445,13 +470,13 @@ class ScenarioRunner:
         
         if test_passed:
             print(f"\n[OK] DURABILITY & RECOVERY VERIFIED:")
-            print(f"  - Committed data persisted (member 601)")
-            print(f"  - Uncommitted data was rolled back (member 602)")
+            print(f"  - Committed data REDONE from logs (member 601)")
+            print(f"  - Uncommitted data UNDONE during recovery (member 602)")
             return True
         else:
             print(f"\n[FAIL] RECOVERY FAILED:")
-            print(f"  - Committed: {member1_after is not None}")
-            print(f"  - Uncommitted rolled back: {member2_after is None}")
+            print(f"  - Committed restored: {member1_after is not None}")
+            print(f"  - Uncommitted removed: {member2_after is None}")
             return False
     
     def run_all_scenarios(self):

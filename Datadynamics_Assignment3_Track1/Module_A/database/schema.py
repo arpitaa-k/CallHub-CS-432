@@ -201,11 +201,28 @@ def populate_sample_data(txm, db_name: str):
         'category_name': 'Public'
     })
     
+    txm.insert(txn_id, db_name, "Data_Categories", {
+        'category_id': 2,
+        'category_name': 'Residential'
+    })
+    
+    txm.insert(txn_id, db_name, "Data_Categories", {
+        'category_id': 5,
+        'category_name': 'Emergency'
+    })
+    
     txm.insert(txn_id, db_name, "Roles", {
         'role_id': 1,
         'role_title': 'Director',
         'can_edit_others': True,
         'can_view_logs': True
+    })
+    
+    txm.insert(txn_id, db_name, "Roles", {
+        'role_id': 8,
+        'role_title': 'Student',
+        'can_edit_others': False,
+        'can_view_logs': False
     })
     
     txm.commit(txn_id, db_name)

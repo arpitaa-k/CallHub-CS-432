@@ -21,7 +21,7 @@ class BPlusTree:
     def __init__(self, order=8):
         self.order = order                                  # Maximum number of children per internal node
         self.root = BPlusTreeNode(order)                    # Start with an empty leaf node as root
-        self.min_keys = math.ceil(order / 2) - 1            # Minimum keys a node must have (except root)
+        self.min_keys = math.ceil(order / 2) - 1           # Minimum keys a node must have (except root)
 
     def search(self, key):
         """Search for a key in the B+ tree and return the associated value"""
@@ -84,10 +84,11 @@ class BPlusTree:
         child = parent.children[index]
         new_node = BPlusTreeNode(self.order, is_leaf=child.is_leaf)
         
-        mid_index = self.order // 2
+        # Calculate midpoint based on actual number of keys being split
+        mid_index = len(child.keys) // 2
 
         if child.is_leaf:
-            # For leaves: copy middle key up, leave it in the leaf as well
+            # For leaves: split keys evenly, middle key goes to both right child and parent
             new_node.keys = child.keys[mid_index:]
             new_node.values = child.values[mid_index:]
             child.keys = child.keys[:mid_index]
@@ -97,15 +98,18 @@ class BPlusTree:
             new_node.next = child.next
             child.next = new_node
             
+            # The first key of right child becomes the separator in parent
             up_key = new_node.keys[0]
         else:
-            # For internal nodes: move middle key up, do not leave it in child
-            new_node.keys = child.keys[mid_index:]
-            new_node.children = child.children[mid_index:]
-            up_key = child.keys[mid_index - 1]
+            # For internal nodes: split around middle key
+            # Middle key goes up to parent (not left or right child)
+            new_node.keys = child.keys[mid_index + 1:]
+            new_node.children = child.children[mid_index + 1:]
+            up_key = child.keys[mid_index]
             
-            child.keys = child.keys[:mid_index - 1]
-            child.children = child.children[:mid_index]
+            # Left child keeps keys before middle, right child gets keys after middle
+            child.keys = child.keys[:mid_index]
+            child.children = child.children[:mid_index + 1]  # Left child needs 1 more pointer than keys
 
         parent.keys.insert(index, up_key)
         parent.children.insert(index + 1, new_node)

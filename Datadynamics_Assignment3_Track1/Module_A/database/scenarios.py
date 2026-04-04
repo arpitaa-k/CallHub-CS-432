@@ -8,7 +8,7 @@ import shutil
 import time
 from db_manager import DatabaseManager
 from transaction_manager import TransactionManager
-from schema import initialize_module_a_schema
+from schema import initialize_module_a_schema, populate_sample_data
 
 
 class ScenarioRunner:
@@ -25,11 +25,22 @@ class ScenarioRunner:
         print("SCENARIO SETUP")
         print("="*80)
         
-        # Clean previous logs
+        # Clean previous logs (gracefully handle locked directories)
         if os.path.exists("logs"):
-            shutil.rmtree("logs")
+            try:
+                shutil.rmtree("logs")
+            except PermissionError:
+                # Directory is locked, try removing files individually
+                try:
+                    for file in os.listdir("logs"):
+                        file_path = os.path.join("logs", file)
+                        if os.path.isfile(file_path):
+                            os.remove(file_path)
+                except:
+                    pass  # Ignore errors if we can't clean up
         
         initialize_module_a_schema(self.dm, self.db_name)
+        populate_sample_data(self.txm, self.db_name)
         print(f"Database '{self.db_name}' initialized")
     
     # ========== SCENARIO 1: Student Enrollment ==========
@@ -128,7 +139,7 @@ class ScenarioRunner:
                 print(f"\n[FAIL] ENROLLMENT FAILED: Commit failed")
                 return False
         else:
-            print(f"\n✗ ENROLLMENT FAILED: Some operations failed, rolling back...")
+            print(f"\n[FAIL] ENROLLMENT FAILED: Some operations failed, rolling back...")
             self.txm.rollback(txn_id, self.db_name)
             return False
     
@@ -198,10 +209,10 @@ class ScenarioRunner:
                 print(f"\n[OK] ROLLBACK SUCCESSFUL: No partial updates remain")
                 return True
             else:
-                print(f"\n✗ ATOMICITY VIOLATED: Member record still exists!")
+                print(f"\n[FAIL] ATOMICITY VIOLATED: Member record still exists!")
                 return False
         else:
-            print(f"\n✗ SCENARIO FAILED: All operations succeeded unexpectedly")
+            print(f"\n[FAIL] SCENARIO FAILED: All operations succeeded unexpectedly")
             self.txm.rollback(txn_id, self.db_name)
             return False
     
@@ -252,7 +263,7 @@ class ScenarioRunner:
                     print(f"\n[OK] DEPARTMENT CREATION SUCCESSFUL")
                     return True
         
-        print(f"\n✗ SCENARIO FAILED")
+        print(f"\n[FAIL] SCENARIO FAILED")
         return False
     
     # ========== SCENARIO 4: Concurrent Member Updates (Isolation) ==========
@@ -349,7 +360,7 @@ class ScenarioRunner:
             return True
         else:
             self.txm.rollback(txn2, self.db_name)
-            print(f"\n✗ SCENARIO FAILED: TXN {txn2} could not proceed")
+            print(f"\n[FAIL] SCENARIO FAILED: TXN {txn2} could not proceed")
             return False
     
     # ========== SCENARIO 5: Crash Recovery ==========
@@ -436,7 +447,7 @@ class ScenarioRunner:
             print(f"  - Uncommitted data was rolled back (member 602)")
             return True
         else:
-            print(f"\n✗ RECOVERY FAILED:")
+            print(f"\n[FAIL] RECOVERY FAILED:")
             print(f"  - Committed: {member1_after is not None}")
             print(f"  - Uncommitted rolled back: {member2_after is None}")
             return False
@@ -466,7 +477,7 @@ class ScenarioRunner:
         print(f"\nScenarios Passed: {passed}/{total}\n")
         
         for name, result in results:
-            status = "✓" if result else "✗"
+            status = "[OK]" if result else "[FAIL]"
             print(f"  {status} {name}")
         
         print("\n" + "="*80)

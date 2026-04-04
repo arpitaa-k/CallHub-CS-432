@@ -5,7 +5,7 @@ Get started with transactions and crash recovery in 5 minutes
 
 from db_manager import DatabaseManager
 from transaction_manager import TransactionManager
-from schema import initialize_module_a_schema
+from schema import initialize_module_a_schema, populate_sample_data
 
 
 def quick_start_demo():
@@ -21,6 +21,7 @@ def quick_start_demo():
     txm = TransactionManager(dm)
     
     initialize_module_a_schema(dm, "QuickStart")
+    populate_sample_data(txm, "QuickStart")
     print("[OK] Database initialized with 12 tables")
     
     # Step 2: Single table transaction

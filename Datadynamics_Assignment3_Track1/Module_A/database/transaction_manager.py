@@ -122,6 +122,11 @@ class TransactionManager:
             self.lock_manager.release_lock(transaction_id, table_name, key)
             return False
         
+        # Validate foreign key constraints
+        if not self._validate_foreign_keys(database_name, table_name, record):
+            self.lock_manager.release_lock(transaction_id, table_name, key)
+            return False
+        
         # Check for duplicates
         if table.data.search(key) is not None:
             print(f"[TXN {transaction_id}] ERROR: Record with {table.search_key} '{key}' already exists")
@@ -142,6 +147,127 @@ class TransactionManager:
         
         print(f"[TXN {transaction_id}] INSERT into {table_name} (key={key})")
         return True
+    
+    def _validate_foreign_keys(self, database_name: str, table_name: str, record: Dict) -> bool:
+        """
+        Validate foreign key constraints for the given record.
+        
+        Returns:
+            True if all foreign keys are valid, False otherwise
+        """
+        try:
+            if table_name == "Members":
+                # Check dept_id references Departments.dept_id
+                if 'dept_id' in record:
+                    dept_table = self.db_manager.get_table(database_name, "Departments")
+                    if dept_table and dept_table.get(record['dept_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - dept_id {record['dept_id']} does not exist in Departments")
+                        return False
+            
+            elif table_name == "Member_Role_Assignments":
+                # Check member_id references Members.member_id
+                if 'member_id' in record:
+                    members_table = self.db_manager.get_table(database_name, "Members")
+                    if members_table and members_table.get(record['member_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - member_id {record['member_id']} does not exist in Members")
+                        return False
+                
+                # Check role_id references Roles.role_id
+                if 'role_id' in record:
+                    roles_table = self.db_manager.get_table(database_name, "Roles")
+                    if roles_table and roles_table.get(record['role_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - role_id {record['role_id']} does not exist in Roles")
+                        return False
+            
+            elif table_name == "Contact_Details":
+                # Check member_id references Members.member_id
+                if 'member_id' in record:
+                    members_table = self.db_manager.get_table(database_name, "Members")
+                    if members_table and members_table.get(record['member_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - member_id {record['member_id']} does not exist in Members")
+                        return False
+                
+                # Check category_id references Data_Categories.category_id
+                if 'category_id' in record:
+                    categories_table = self.db_manager.get_table(database_name, "Data_Categories")
+                    if categories_table and categories_table.get(record['category_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - category_id {record['category_id']} does not exist in Data_Categories")
+                        return False
+            
+            elif table_name == "Locations":
+                # Check member_id references Members.member_id
+                if 'member_id' in record:
+                    members_table = self.db_manager.get_table(database_name, "Members")
+                    if members_table and members_table.get(record['member_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - member_id {record['member_id']} does not exist in Members")
+                        return False
+                
+                # Check category_id references Data_Categories.category_id
+                if 'category_id' in record:
+                    categories_table = self.db_manager.get_table(database_name, "Data_Categories")
+                    if categories_table and categories_table.get(record['category_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - category_id {record['category_id']} does not exist in Data_Categories")
+                        return False
+            
+            elif table_name == "Emergency_Contacts":
+                # Check member_id references Members.member_id
+                if 'member_id' in record:
+                    members_table = self.db_manager.get_table(database_name, "Members")
+                    if members_table and members_table.get(record['member_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - member_id {record['member_id']} does not exist in Members")
+                        return False
+                
+                # Check category_id references Data_Categories.category_id
+                if 'category_id' in record:
+                    categories_table = self.db_manager.get_table(database_name, "Data_Categories")
+                    if categories_table and categories_table.get(record['category_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - category_id {record['category_id']} does not exist in Data_Categories")
+                        return False
+            
+            elif table_name == "Role_Permissions":
+                # Check role_id references Roles.role_id
+                if 'role_id' in record:
+                    roles_table = self.db_manager.get_table(database_name, "Roles")
+                    if roles_table and roles_table.get(record['role_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - role_id {record['role_id']} does not exist in Roles")
+                        return False
+                
+                # Check category_id references Data_Categories.category_id
+                if 'category_id' in record:
+                    categories_table = self.db_manager.get_table(database_name, "Data_Categories")
+                    if categories_table and categories_table.get(record['category_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - category_id {record['category_id']} does not exist in Data_Categories")
+                        return False
+            
+            elif table_name == "Search_Logs":
+                # Check searched_by_member_id references Members.member_id
+                if 'searched_by_member_id' in record:
+                    members_table = self.db_manager.get_table(database_name, "Members")
+                    if members_table and members_table.get(record['searched_by_member_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - searched_by_member_id {record['searched_by_member_id']} does not exist in Members")
+                        return False
+            
+            elif table_name == "Audit_Trail":
+                # Check actor_id references Members.member_id
+                if 'actor_id' in record:
+                    members_table = self.db_manager.get_table(database_name, "Members")
+                    if members_table and members_table.get(record['actor_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - actor_id {record['actor_id']} does not exist in Members")
+                        return False
+            
+            elif table_name == "User_Credentials":
+                # Check member_id references Members.member_id
+                if 'member_id' in record:
+                    members_table = self.db_manager.get_table(database_name, "Members")
+                    if members_table and members_table.get(record['member_id']) is None:
+                        print(f"[TXN] ERROR: Foreign key violation - member_id {record['member_id']} does not exist in Members")
+                        return False
+            
+            return True
+        
+        except Exception as e:
+            print(f"[TXN] ERROR: Foreign key validation failed: {e}")
+            return False
     
     def update(self, transaction_id: int, database_name: str, table_name: str,
                record_id: Any, new_record: Dict) -> bool:
@@ -173,6 +299,11 @@ class TransactionManager:
         
         # Validate
         if not table.validate_record(new_record):
+            self.lock_manager.release_lock(transaction_id, table_name, record_id)
+            return False
+        
+        # Validate foreign key constraints
+        if not self._validate_foreign_keys(database_name, table_name, new_record):
             self.lock_manager.release_lock(transaction_id, table_name, record_id)
             return False
         

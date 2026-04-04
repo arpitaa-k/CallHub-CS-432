@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-04T15:23:55.156519+00:00",
+  "timestamp": "2026-04-04T19:06:02.903855+00:00",
   "base_url": "http://127.0.0.1:5000",
   "target_member_id": 1,
   "race_condition_test": {
@@ -19,10 +19,10 @@
     },
     "timing_ms": {
       "count": 60,
-      "min": 45.273,
-      "avg": 232.699,
-      "p95": 376.862,
-      "max": 405.195
+      "min": 96.947,
+      "avg": 260.021,
+      "p95": 351.362,
+      "max": 358.779
     },
     "final_member": {
       "status": 200,
@@ -55,7 +55,7 @@
           }
         ],
         "emergency_name": "Mrs. Mishra",
-        "full_name": "RaceUpdate_58_20260404152353",
+        "full_name": "RaceUpdate_59_20260404190601",
         "gender": "M",
         "join_date": "2026-03-15",
         "location_type": "Office",
@@ -81,78 +81,12 @@
     },
     "records": [
       {
-        "i": 9,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 242.362,
-        "name": "RaceUpdate_9_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 1,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 285.256,
-        "name": "RaceUpdate_1_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 8,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 320.886,
-        "name": "RaceUpdate_8_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
         "i": 4,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 323.094,
-        "name": "RaceUpdate_4_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 6,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 338.267,
-        "name": "RaceUpdate_6_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 3,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 347.959,
-        "name": "RaceUpdate_3_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 2,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 345.626,
-        "name": "RaceUpdate_2_20260404152352",
+        "time_ms": 254.608,
+        "name": "RaceUpdate_4_20260404190559",
         "response": {
           "message": "Member updated"
         }
@@ -162,8 +96,8 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 355.453,
-        "name": "RaceUpdate_5_20260404152352",
+        "time_ms": 300.542,
+        "name": "RaceUpdate_5_20260404190559",
         "response": {
           "message": "Member updated"
         }
@@ -173,74 +107,19 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 351.43,
-        "name": "RaceUpdate_13_20260404152352",
+        "time_ms": 290.734,
+        "name": "RaceUpdate_13_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 10,
+        "i": 6,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 353.429,
-        "name": "RaceUpdate_10_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 7,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 359.438,
-        "name": "RaceUpdate_7_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 15,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 405.195,
-        "name": "RaceUpdate_15_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 11,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 370.226,
-        "name": "RaceUpdate_11_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 19,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 346.803,
-        "name": "RaceUpdate_19_20260404152352",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 0,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 376.862,
-        "name": "RaceUpdate_0_20260404152352",
+        "time_ms": 294.665,
+        "name": "RaceUpdate_6_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -250,8 +129,30 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 369.973,
-        "name": "RaceUpdate_12_20260404152352",
+        "time_ms": 296.494,
+        "name": "RaceUpdate_12_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 7,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 302.152,
+        "name": "RaceUpdate_7_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 2,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 314.14,
+        "name": "RaceUpdate_2_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -261,30 +162,85 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 370.938,
-        "name": "RaceUpdate_14_20260404152352",
+        "time_ms": 319.737,
+        "name": "RaceUpdate_14_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 18,
+        "i": 1,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 370.228,
-        "name": "RaceUpdate_18_20260404152352",
+        "time_ms": 327.245,
+        "name": "RaceUpdate_1_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 16,
+        "i": 0,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 388.673,
-        "name": "RaceUpdate_16_20260404152352",
+        "time_ms": 346.749,
+        "name": "RaceUpdate_0_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 8,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 340.211,
+        "name": "RaceUpdate_8_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 9,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 336.537,
+        "name": "RaceUpdate_9_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 11,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 345.663,
+        "name": "RaceUpdate_11_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 10,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 348.763,
+        "name": "RaceUpdate_10_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 3,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 345.878,
+        "name": "RaceUpdate_3_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -294,19 +250,52 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 381.585,
-        "name": "RaceUpdate_17_20260404152352",
+        "time_ms": 358.779,
+        "name": "RaceUpdate_17_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 20,
+        "i": 18,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 113.688,
-        "name": "RaceUpdate_20_20260404152352",
+        "time_ms": 355.858,
+        "name": "RaceUpdate_18_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 16,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 356.497,
+        "name": "RaceUpdate_16_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 15,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 351.362,
+        "name": "RaceUpdate_15_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 19,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 350.554,
+        "name": "RaceUpdate_19_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -316,19 +305,19 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 116.701,
-        "name": "RaceUpdate_21_20260404152352",
+        "time_ms": 219.255,
+        "name": "RaceUpdate_21_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 23,
+        "i": 20,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 141.839,
-        "name": "RaceUpdate_23_20260404152352",
+        "time_ms": 244.197,
+        "name": "RaceUpdate_20_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -338,19 +327,19 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 180.57,
-        "name": "RaceUpdate_22_20260404152352",
+        "time_ms": 262.976,
+        "name": "RaceUpdate_22_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 24,
+        "i": 23,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 215.642,
-        "name": "RaceUpdate_24_20260404152352",
+        "time_ms": 257.818,
+        "name": "RaceUpdate_23_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -360,41 +349,19 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 228.938,
-        "name": "RaceUpdate_25_20260404152352",
+        "time_ms": 271.159,
+        "name": "RaceUpdate_25_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 28,
+        "i": 24,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 232.208,
-        "name": "RaceUpdate_28_20260404152353",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 29,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 258.449,
-        "name": "RaceUpdate_29_20260404152353",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 26,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 317.937,
-        "name": "RaceUpdate_26_20260404152353",
+        "time_ms": 295.086,
+        "name": "RaceUpdate_24_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -404,30 +371,41 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 313.282,
-        "name": "RaceUpdate_27_20260404152353",
+        "time_ms": 290.931,
+        "name": "RaceUpdate_27_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 32,
+        "i": 26,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 294.324,
-        "name": "RaceUpdate_32_20260404152353",
+        "time_ms": 304.547,
+        "name": "RaceUpdate_26_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 30,
+        "i": 28,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 301.721,
-        "name": "RaceUpdate_30_20260404152353",
+        "time_ms": 297.622,
+        "name": "RaceUpdate_28_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 29,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 293.407,
+        "name": "RaceUpdate_29_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -437,8 +415,19 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 297.007,
-        "name": "RaceUpdate_31_20260404152353",
+        "time_ms": 291.546,
+        "name": "RaceUpdate_31_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 30,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 293.031,
+        "name": "RaceUpdate_30_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -448,8 +437,8 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 290.511,
-        "name": "RaceUpdate_33_20260404152353",
+        "time_ms": 286.663,
+        "name": "RaceUpdate_33_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -459,30 +448,19 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 282.388,
-        "name": "RaceUpdate_34_20260404152353",
+        "time_ms": 298.26,
+        "name": "RaceUpdate_34_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 36,
+        "i": 32,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 289.879,
-        "name": "RaceUpdate_36_20260404152353",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 37,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 271.023,
-        "name": "RaceUpdate_37_20260404152353",
+        "time_ms": 311.468,
+        "name": "RaceUpdate_32_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -492,19 +470,30 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 301.003,
-        "name": "RaceUpdate_35_20260404152353",
+        "time_ms": 300.254,
+        "name": "RaceUpdate_35_20260404190600",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 39,
+        "i": 36,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 293.526,
-        "name": "RaceUpdate_39_20260404152353",
+        "time_ms": 275.072,
+        "name": "RaceUpdate_36_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 37,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 265.113,
+        "name": "RaceUpdate_37_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -514,8 +503,19 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 304.348,
-        "name": "RaceUpdate_38_20260404152353",
+        "time_ms": 258.314,
+        "name": "RaceUpdate_38_20260404190600",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 39,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 249.442,
+        "name": "RaceUpdate_39_20260404190600",
         "response": {
           "message": "Member updated"
         }
@@ -525,8 +525,8 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 263.466,
-        "name": "RaceUpdate_40_20260404152353",
+        "time_ms": 100.125,
+        "name": "RaceUpdate_40_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -536,8 +536,8 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 241.043,
-        "name": "RaceUpdate_41_20260404152353",
+        "time_ms": 97.425,
+        "name": "RaceUpdate_41_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -547,19 +547,8 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 189.307,
-        "name": "RaceUpdate_42_20260404152353",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 43,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 154.55,
-        "name": "RaceUpdate_43_20260404152353",
+        "time_ms": 124.972,
+        "name": "RaceUpdate_42_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -569,8 +558,8 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 122.844,
-        "name": "RaceUpdate_44_20260404152353",
+        "time_ms": 96.947,
+        "name": "RaceUpdate_44_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -580,19 +569,19 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 94.33,
-        "name": "RaceUpdate_45_20260404152353",
+        "time_ms": 140.41,
+        "name": "RaceUpdate_45_20260404190601",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 46,
+        "i": 43,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 67.674,
-        "name": "RaceUpdate_46_20260404152353",
+        "time_ms": 176.741,
+        "name": "RaceUpdate_43_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -602,19 +591,8 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 45.381,
-        "name": "RaceUpdate_47_20260404152353",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 49,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 50.54,
-        "name": "RaceUpdate_49_20260404152353",
+        "time_ms": 189.324,
+        "name": "RaceUpdate_47_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -624,8 +602,8 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 58.452,
-        "name": "RaceUpdate_50_20260404152353",
+        "time_ms": 204.72,
+        "name": "RaceUpdate_50_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -635,41 +613,30 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 89.08,
-        "name": "RaceUpdate_48_20260404152353",
+        "time_ms": 230.231,
+        "name": "RaceUpdate_48_20260404190601",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 52,
+        "i": 49,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 54.386,
-        "name": "RaceUpdate_52_20260404152353",
+        "time_ms": 239.373,
+        "name": "RaceUpdate_49_20260404190601",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 53,
+        "i": 46,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 46.423,
-        "name": "RaceUpdate_53_20260404152353",
-        "response": {
-          "message": "Member updated"
-        }
-      },
-      {
-        "i": 54,
-        "op": "update",
-        "ok": true,
-        "status": 200,
-        "time_ms": 52.031,
-        "name": "RaceUpdate_54_20260404152353",
+        "time_ms": 242.349,
+        "name": "RaceUpdate_46_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -679,30 +646,30 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 88.953,
-        "name": "RaceUpdate_51_20260404152353",
+        "time_ms": 195.338,
+        "name": "RaceUpdate_51_20260404190601",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 55,
+        "i": 54,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 47.608,
-        "name": "RaceUpdate_55_20260404152353",
+        "time_ms": 185.825,
+        "name": "RaceUpdate_54_20260404190601",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 57,
+        "i": 53,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 45.273,
-        "name": "RaceUpdate_57_20260404152353",
+        "time_ms": 204.253,
+        "name": "RaceUpdate_53_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -712,19 +679,41 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 78.328,
-        "name": "RaceUpdate_56_20260404152353",
+        "time_ms": 188.834,
+        "name": "RaceUpdate_56_20260404190601",
         "response": {
           "message": "Member updated"
         }
       },
       {
-        "i": 59,
+        "i": 52,
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 50.284,
-        "name": "RaceUpdate_59_20260404152353",
+        "time_ms": 193.921,
+        "name": "RaceUpdate_52_20260404190601",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 55,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 199.725,
+        "name": "RaceUpdate_55_20260404190601",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 57,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 187.734,
+        "name": "RaceUpdate_57_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -734,8 +723,19 @@
         "op": "update",
         "ok": true,
         "status": 200,
-        "time_ms": 73.319,
-        "name": "RaceUpdate_58_20260404152353",
+        "time_ms": 157.791,
+        "name": "RaceUpdate_58_20260404190601",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 59,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 141.909,
+        "name": "RaceUpdate_59_20260404190601",
         "response": {
           "message": "Member updated"
         }
@@ -746,14 +746,14 @@
     "seed_create": {
       "status": 200,
       "data": {
-        "member_id": 258,
+        "member_id": 265,
         "message": "Member created"
       }
     },
     "forced_failure_create": {
       "status": 500,
       "data": {
-        "error": "(1062, \"Duplicate entry 'rf_dup_20260404152354' for key 'user_credentials.username'\")"
+        "error": "(1062, \"Duplicate entry 'rf_dup_20260404190602' for key 'user_credentials.username'\")"
       }
     },
     "verification": {

@@ -1,0 +1,50 @@
+{
+  "target_member_id": 1,
+  "metrics": {
+    "login_ok": 50,
+    "login_fail": 0,
+    "admin_read_ok": 861,
+    "admin_read_fail": 0,
+    "admin_update_ok": 305,
+    "admin_update_fail": 0,
+    "unauth_update_denied": 218,
+    "unauth_update_other": 0,
+    "infra_errors": 0
+  },
+  "verification": {
+    "admin_updates_succeeded": true,
+    "unauthorized_updates_blocked": true,
+    "no_infra_errors": true,
+    "login_healthy": true,
+    "note": "403 on unauthorized updates is expected; any status0 or 5xx indicates a real problem."
+  },
+  "locust_stats": {
+    "total_requests": 3598,
+    "total_failures": 0,
+    "avg_response_time_ms": 46.02218154545418,
+    "p95_response_time_ms": 90,
+    "requests_per_sec": 122.5
+  },
+  "sample_successful_update_names": [
+    "LocustStress_Prof. Arvind Mishra_6228",
+    "LocustStress_Prof. Arvind Mishra_8695",
+    "LocustStress_Prof. Arvind Mishra_4089",
+    "LocustStress_Prof. Arvind Mishra_8623",
+    "LocustStress_Prof. Arvind Mishra_7398",
+    "LocustStress_Prof. Arvind Mishra_9639",
+    "LocustStress_Prof. Arvind Mishra_1760",
+    "LocustStress_Prof. Arvind Mishra_6254",
+    "LocustStress_Prof. Arvind Mishra_3259",
+    "LocustStress_Prof. Arvind Mishra_7881",
+    "LocustStress_Prof. Arvind Mishra_8610",
+    "LocustStress_Prof. Arvind Mishra_8588",
+    "LocustStress_Prof. Arvind Mishra_9832",
+    "LocustStress_Prof. Arvind Mishra_2342",
+    "LocustStress_Prof. Arvind Mishra_7254",
+    "LocustStress_Prof. Arvind Mishra_3610",
+    "LocustStress_Prof. Arvind Mishra_7534",
+    "LocustStress_Prof. Arvind Mishra_1343",
+    "LocustStress_Prof. Arvind Mishra_4613",
+    "LocustStress_Prof. Arvind Mishra_1556"
+  ]
+}

@@ -348,6 +348,79 @@ All ACID tests should pass with a success rate of `100%` after initializing the 
 
 1. **Forward pass**: Redo all COMMIT entries
 2. **Backward pass**: Undo uncommitted transactions (reverse order)
+
+## Quick Reference
+
+### Basic Transaction
+```python
+txn_id = txm.begin_transaction()
+txm.insert(txn_id, "MyDB", "Members", {'member_id': 1, 'full_name': 'John'})
+txm.commit(txn_id, "MyDB")
+```
+
+### Multi-Table Transaction (Atomic)
+```python
+txn_id = txm.begin_transaction()
+txm.insert(txn_id, "MyDB", "Members", member_record)
+txm.insert(txn_id, "MyDB", "Contact_Details", contact_record)
+txm.insert(txn_id, "MyDB", "Locations", location_record)
+txm.commit(txn_id, "MyDB")  # All 3 committed atomically
+```
+
+### Recovery from Crash
+```python
+recovery_stats = txm.recover_from_crash("MyDB")
+print(f"Redone: {recovery_stats['redone_txns']} transactions")
+print(f"Undone: {recovery_stats['undone_txns']} transactions")
+```
+
+## Deliverables Summary
+
+### Files Created (9 new files)
+
+1. **transaction_manager.py** - Central transaction coordinator (400+ lines)
+2. **logger.py** - Write-Ahead Logging with durability (320+ lines)
+3. **lock_manager.py** - Lock-based concurrency control (220+ lines)
+4. **recovery_manager.py** - Crash recovery with redo/undo (240+ lines)
+5. **schema.py** - 12-table database schema initialization (250+ lines)
+6. **test_acid.py** - Comprehensive ACID test suite (450+ lines, 10 tests)
+7. **scenarios.py** - Real-world transaction scenarios (500+ lines, 5 scenarios)
+8. **quickstart.py** - Quick start tutorial and examples (300+ lines)
+9. **MODULE_A_README.md** - Complete documentation (this file)
+
+### Features Implemented
+
+✅ **Multi-table ACID Transactions**: Atomicity across 3+ tables  
+✅ **Crash Recovery**: Redo committed, undo uncommitted transactions  
+✅ **Write-Ahead Logging**: Persisted transaction logs with fsync()  
+✅ **Lock-based Isolation**: READ/WRITE locks with deadlock detection  
+✅ **2PL Protocol**: Two-phase locking for serializability  
+✅ **12 Database Tables**: Complete schema from assignment  
+✅ **10 ACID Tests**: Comprehensive test coverage  
+✅ **5 Real-world Scenarios**: Student enrollment, concurrent ops, recovery  
+✅ **Referential Integrity**: Foreign key validation  
+✅ **Data Type Validation**: Schema compliance enforcement  
+
+## Key Implementation Details
+
+### Write-Ahead Logging
+
+1. **Before** applying operation: Write to log
+2. Immediate fsync() to ensure durability
+3. Log entry contains full undo/redo information
+4. Transaction COMMIT is just a log entry
+
+### Lock Manager
+
+1. **Hash map** of resource -> lock info
+2. **Lock info**: type (READ/WRITE), owners, waiters
+3. **Timeout**: 5 seconds default per lock
+4. **Release**: Automatic on COMMIT/ROLLBACK
+
+### Recovery Manager
+
+1. **Forward pass**: Redo all COMMIT entries
+2. **Backward pass**: Undo uncommitted transactions (reverse order)
 3. **Checkpoint**: Track recovery progress
 
 ### Transaction Manager

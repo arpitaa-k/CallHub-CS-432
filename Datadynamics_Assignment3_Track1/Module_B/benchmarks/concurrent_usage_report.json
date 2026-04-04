@@ -1,0 +1,581 @@
+{
+  "timestamp": "2026-04-04T11:24:12.468673Z",
+  "base_url": "http://127.0.0.1:5000",
+  "target_member_id": 1,
+  "users_count": 3,
+  "scenarios": {
+    "concurrent_own_profile_reads": {
+      "summary": {
+        "mode": "read",
+        "total_requests": 10,
+        "workers": 10,
+        "login_success": 10,
+        "login_fail": 0,
+        "op_success": 10,
+        "op_fail": 0,
+        "status_code_distribution": {
+          "200": 10
+        },
+        "timing_ms": {
+          "count": 10,
+          "min": 49.39,
+          "avg": 55.112,
+          "p95": 58.857,
+          "max": 61.192
+        }
+      },
+      "records": [
+        {
+          "operation": "login",
+          "actor": "Prof. Arvind Mishra",
+          "ok": true,
+          "info": {
+            "status": 200,
+            "response": {
+              "member_id": 1,
+              "message": "Login successful"
+            }
+          }
+        },
+        {
+          "operation": "read",
+          "actor": "Prof. Arvind Mishra",
+          "status_code": 200,
+          "ok": true,
+          "time_ms": 61.19150001904927,
+          "response": {
+            "contacts": [
+              {
+                "category_id": 1,
+                "category_name": "Public",
+                "contact_type": "Official Email",
+                "contact_value": "director@inst.ac.in"
+              }
+            ],
+            "emergency_contacts": [
+              {
+                "category_id": 1,
+                "category_name": "Public",
+                "contact_person_name": "Mrs. Mishra",
+                "emergency_phone": "9988112241",
+                "relation": "Wife"
+              }
+            ],
+            "locations": [
+              {
+                "building_name": "Main Admin Wing",
+                "category_id": 1,
+                "category_name": "Public",
+                "location_type": "Office",
+                "room_number": "101 (Director)"
+              }
+            ],
+            "member": {
+              "age": 58,
+              "department": {
+                "building_location": "Main Admin Wing",
+                "dept_code": "ADMIN",
+                "dept_name": "Central Administration",
+                "is_academic": 0
+              },
+              "dept_id": 9,
+              "designation": "Director",
+              "full_name": "RaceUpdate_59_20260404112401",
+              "gender": "M",
+              "is_active": 1,
+              "join_date": "2026-03-15",
+              "member_id": 1
+            }
+          }
+        },
+        {
+          "operation": "login",
+          "actor": "Prof. Arvind Mishra",
+          "ok": true,
+          "info": {
+            "status": 200,
+            "response": {
+              "member_id": 1,
+              "message": "Login successful"
+            }
+          }
+        },
+        {
+          "operation": "read",
+          "actor": "Prof. Arvind Mishra",
+          "status_code": 200,
+          "ok": true,
+          "time_ms": 51.12729998654686,
+          "response": {
+            "contacts": [
+              {
+                "category_id": 1,
+                "category_name": "Public",
+                "contact_type": "Official Email",
+                "contact_value": "director@inst.ac.in"
+              }
+            ],
+            "emergency_contacts": [
+              {
+                "category_id": 1,
+                "category_name": "Public",
+                "contact_person_name": "Mrs. Mishra",
+                "emergency_phone": "9988112241",
+                "relation": "Wife"
+              }
+            ],
+            "locations": [
+              {
+                "building_name": "Main Admin Wing",
+                "category_id": 1,
+                "category_name": "Public",
+                "location_type": "Office",
+                "room_number": "101 (Director)"
+              }
+            ],
+            "member": {
+              "age": 58,
+              "department": {
+                "building_location": "Main Admin Wing",
+                "dept_code": "ADMIN",
+                "dept_name": "Central Administration",
+                "is_academic": 0
+              },
+              "dept_id": 9,
+              "designation": "Director",
+              "full_name": "RaceUpdate_59_20260404112401",
+              "gender": "M",
+              "is_active": 1,
+              "join_date": "2026-03-15",
+              "member_id": 1
+            }
+          }
+        },
+        {
+          "operation": "login",
+          "actor": "Mrs. Geeta Ben",
+          "ok": true,
+          "info": {
+            "status": 200,
+            "response": {
+              "member_id": 18,
+              "message": "Login successful"
+            }
+          }
+        },
+        {
+          "operation": "read",
+          "actor": "Mrs. Geeta Ben",
+          "status_code": 200,
+          "ok": true,
+          "time_ms": 56.68780000996776,
+          "response": {
+            "contacts": [],
+            "emergency_contacts": [],
+            "locations": [],
+            "member": {
+              "age": 45,
+              "department": {
+                "building_location": "Student Activity Center",
+                "dept_code": "HSTL",
+                "dept_name": "Hostel Administration",
+                "is_academic": 0
+              },
+              "dept_id": 10,
+              "designation": "Warden Girls Hostel",
+              "full_name": "Mrs. Geeta Ben",
+              "gender": "F",
+              "is_active": 1,
+              "join_date": "2026-03-15",
+              "member_id": 18
+            }
+          }
+        },
+        {
+          "operation": "login",
+          "actor": "Riya Sen",
+          "ok": true,
+          "info": {
+            "status": 200,
+            "response": {
+              "member_id": 10,
+              "message": "Login successful"
+            }
+          }
+        },
+        {
+          "operation": "read",
+          "actor": "Riya Sen",
+          "status_code": 200,
+          "ok": true,
+          "time_ms": 58.85699999635108,
+          "response": {
+            "contacts": [],
+            "emergency_contacts": [],
+            "locations": [],
+            "member": {
+              "age": 19,
+              "department": {
+                "building_location": "Tesla Hall",
+                "dept_code": "EE",
+                "dept_name": "Electrical Engineering",
+                "is_academic": 1
+              },
+              "dept_id": 2,
+              "designation": "BTech EE 2nd Yr",
+              "full_name": "Riya Sen",
+              "gender": "F",
+              "is_active": 1,
+              "join_date": "2026-03-15",
+              "member_id": 10
+            }
+          }
+        },
+        {
+          "operation": "login",
+          "actor": "Mrs. Geeta Ben",
+          "ok": true,
+          "info": {
+            "status": 200,
+            "response": {
+              "member_id": 18,
+              "message": "Login successful"
+            }
+          }
+        },
+        {
+          "operation": "read",
+          "actor": "Mrs. Geeta Ben",
+          "status_code": 200,
+          "ok": true,
+          "time_ms": 54.627700010314584,
+          "response": {
+            "contacts": [],
+            "emergency_contacts": [],
+            "locations": [],
+            "member": {
+              "age": 45,
+              "department": {
+                "building_location": "Student Activity Center",
+                "dept_code": "HSTL",
+                "dept_name": "Hostel Administration",
+                "is_academic": 0
+              },
+              "dept_id": 10,
+              "designation": "Warden Girls Hostel",
+              "full_name": "Mrs. Geeta Ben",
+              "gender": "F",
+              "is_active": 1,
+              "join_date": "2026-03-15",
+              "member_id": 18
+            }
+          }
+        },
+        {
+          "operation": "login",
+          "actor": "Prof. Arvind Mishra",
+          "ok": true,
+          "info": {
+            "status": 200,
+            "response": {
+              "member_id": 1,
+              "message": "Login successful"
+            }
+          }
+        },
+        {
+          "operation": "read",
+          "actor": "Prof. Arvind Mishra",
+          "status_code": 200,
+          "ok": true,
+          "time_ms": 57.53210000693798,
+          "response": {
+            "contacts": [
+              {
+                "category_id": 1,
+                "category_name": "Public",
+                "contact_type": "Official Email",
+                "contact_value": "director@inst.ac.in"
+              }
+            ],
+            "emergency_contacts": [
+              {
+                "category_id": 1,
+                "category_name": "Public",
+                "contact_person_name": "Mrs. Mishra",
+                "emergency_phone": "9988112241",
+                "relation": "Wife"
+              }
+            ],
+            "locations": [
+              {
+                "building_name": "Main Admin Wing",
+                "category_id": 1,
+                "category_name": "Public",
+                "location_type": "Office",
+                "room_number": "101 (Director)"
+              }
+            ],
+            "member": {
+              "age": 58,
+              "department": {
+                "building_location": "Main Admin Wing",
+                "dept_code": "ADMIN",
+                "dept_name": "Central Administration",
+                "is_academic": 0
+              },
+              "dept_id": 9,
+              "designation": "Director",
+              "full_name": "RaceUpdate_59_20260404112401",
+              "gender": "M",
+              "is_active": 1,
+              "join_date": "2026-03-15",
+              "member_id": 1
+            }
+          }
+        },
+        {
+          "operation": "login",
+          "actor": "Mrs. Geeta Ben",
+          "ok": true,
+          "info": {
+            "status": 200,
+            "response": {
+              "member_id": 18,
+              "message": "Login successful"
+            }
+          }
+        },
+        {
+          "operation": "read",
+          "actor": "Mrs. Geeta Ben",
+          "status_code": 200,
+          "ok": true,
+          "time_ms": 49.390200001653284,
+          "response": {
+            "contacts": [],
+            "emergency_contacts": [],
+            "locations": [],
+            "member": {
+              "age": 45,
+              "department": {
+                "building_location": "Student Activity Center",
+                "dept_code": "HSTL",
+                "dept_name": "Hostel Administration",
+                "is_academic": 0
+              },
+              "dept_id": 10,
+              "designation": "Warden Girls Hostel",
+              "full_name": "Mrs. Geeta Ben",
+              "gender": "F",
+              "is_active": 1,
+              "join_date": "2026-03-15",
+              "member_id": 18
+            }
+          }
+        },
+        {
+          "operation": "login",
+          "actor": "Prof. Arvind Mishra",
+          "ok": true,
+          "info": {
+            "status": 200,
+            "response": {
+              "member_id": 1,
+              "message": "Login successful"
+            }
+          }
+        },
+        {
+          "operation": "read",
+          "actor": "Prof. Arvind Mishra",
+          "status_code": 200,
+          "ok": true,
+          "time_ms": 55.789100006222725,
+          "response": {
+            "contacts": [
+              {
+                "category_id": 1,
+                "category_name": "Public",
+                "contact_type": "Official Email",
+                "contact_value": "director@inst.ac.in"
+              }
+            ],
+            "emergency_contacts": [
+              {
+                "category_id": 1,
+                "category_name": "Public",
+                "contact_person_name": "Mrs. Mishra",
+                "emergency_phone": "9988112241",
+                "relation": "Wife"
+              }
+            ],
+            "locations": [
+              {
+                "building_name": "Main Admin Wing",
+                "category_id": 1,
+                "category_name": "Public",
+                "location_type": "Office",
+                "room_number": "101 (Director)"
+              }
+            ],
+            "member": {
+              "age": 58,
+              "department": {
+                "building_location": "Main Admin Wing",
+                "dept_code": "ADMIN",
+                "dept_name": "Central Administration",
+                "is_academic": 0
+              },
+              "dept_id": 9,
+              "designation": "Director",
+              "full_name": "RaceUpdate_59_20260404112401",
+              "gender": "M",
+              "is_active": 1,
+              "join_date": "2026-03-15",
+              "member_id": 1
+            }
+          }
+        },
+        {
+          "operation": "login",
+          "actor": "Riya Sen",
+          "ok": true,
+          "info": {
+            "status": 200,
+            "response": {
+              "member_id": 10,
+              "message": "Login successful"
+            }
+          }
+        },
+        {
+          "operation": "read",
+          "actor": "Riya Sen",
+          "status_code": 200,
+          "ok": true,
+          "time_ms": 50.11999999987893,
+          "response": {
+            "contacts": [],
+            "emergency_contacts": [],
+            "locations": [],
+            "member": {
+              "age": 19,
+              "department": {
+                "building_location": "Tesla Hall",
+                "dept_code": "EE",
+                "dept_name": "Electrical Engineering",
+                "is_academic": 1
+              },
+              "dept_id": 2,
+              "designation": "BTech EE 2nd Yr",
+              "full_name": "Riya Sen",
+              "gender": "F",
+              "is_active": 1,
+              "join_date": "2026-03-15",
+              "member_id": 10
+            }
+          }
+        },
+        {
+          "operation": "login",
+          "actor": "Riya Sen",
+          "ok": true,
+          "info": {
+            "status": 200,
+            "response": {
+              "member_id": 10,
+              "message": "Login successful"
+            }
+          }
+        },
+        {
+          "operation": "read",
+          "actor": "Riya Sen",
+          "status_code": 200,
+          "ok": true,
+          "time_ms": 55.80130001180805,
+          "response": {
+            "contacts": [],
+            "emergency_contacts": [],
+            "locations": [],
+            "member": {
+              "age": 19,
+              "department": {
+                "building_location": "Tesla Hall",
+                "dept_code": "EE",
+                "dept_name": "Electrical Engineering",
+                "is_academic": 1
+              },
+              "dept_id": 2,
+              "designation": "BTech EE 2nd Yr",
+              "full_name": "Riya Sen",
+              "gender": "F",
+              "is_active": 1,
+              "join_date": "2026-03-15",
+              "member_id": 10
+            }
+          }
+        }
+      ]
+    }
+  },
+  "final_member_state": {
+    "operation": "read",
+    "actor": "Prof. Arvind Mishra",
+    "status_code": 200,
+    "ok": true,
+    "time_ms": 22.694300016155466,
+    "response": {
+      "contacts": [
+        {
+          "category_id": 1,
+          "category_name": "Public",
+          "contact_type": "Official Email",
+          "contact_value": "director@inst.ac.in"
+        }
+      ],
+      "emergency_contacts": [
+        {
+          "category_id": 1,
+          "category_name": "Public",
+          "contact_person_name": "Mrs. Mishra",
+          "emergency_phone": "9988112241",
+          "relation": "Wife"
+        }
+      ],
+      "locations": [
+        {
+          "building_name": "Main Admin Wing",
+          "category_id": 1,
+          "category_name": "Public",
+          "location_type": "Office",
+          "room_number": "101 (Director)"
+        }
+      ],
+      "member": {
+        "age": 58,
+        "department": {
+          "building_location": "Main Admin Wing",
+          "dept_code": "ADMIN",
+          "dept_name": "Central Administration",
+          "is_academic": 0
+        },
+        "dept_id": 9,
+        "designation": "Director",
+        "full_name": "RaceUpdate_59_20260404112401",
+        "gender": "M",
+        "is_active": 1,
+        "join_date": "2026-03-15",
+        "member_id": 1
+      }
+    }
+  },
+  "verdict": {
+    "overall": "PASS",
+    "checks": {
+      "concurrent_own_profile_reads": true
+    },
+    "note": "This is a basic concurrency sanity check for users reading their own profiles at the same time."
+  }
+}

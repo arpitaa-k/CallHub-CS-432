@@ -1,0 +1,764 @@
+{
+  "timestamp": "2026-04-04T11:24:02.595227+00:00",
+  "base_url": "http://127.0.0.1:5000",
+  "target_member_id": 1,
+  "race_condition_test": {
+    "attempts": 60,
+    "workers": 20,
+    "admin_users_used": 1,
+    "ok": 60,
+    "fail": 0,
+    "status_distribution": {
+      "200": 60
+    },
+    "correctness": {
+      "all_attempts_accounted_for": true,
+      "no_5xx": true,
+      "last_write_wins_legitimate": true,
+      "successful_update_count": 60
+    },
+    "timing_ms": {
+      "count": 60,
+      "min": 86.233,
+      "avg": 298.207,
+      "p95": 488.001,
+      "max": 496.203
+    },
+    "final_member": {
+      "status": 200,
+      "data": {
+        "age": 58,
+        "assign_date": "2020-01-15",
+        "building_location": "Main Admin Wing",
+        "building_name": "Main Admin Wing",
+        "category_name": "Public",
+        "contact_type": "Official Email",
+        "contact_value": "director@inst.ac.in",
+        "dept_code": "ADMIN",
+        "dept_id": 9,
+        "dept_name": "Central Administration",
+        "designation": "Director",
+        "emergency_contact": "9988112241",
+        "emergency_name": "Mrs. Mishra",
+        "full_name": "RaceUpdate_59_20260404112401",
+        "gender": "M",
+        "join_date": "2026-03-15",
+        "location_type": "Office",
+        "member_id": 1,
+        "relation": "Wife",
+        "role_title": "Admin",
+        "room_number": "101 (Director)",
+        "username": "Prof. Arvind Mishra"
+      }
+    },
+    "records": [
+      {
+        "i": 3,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 459.41,
+        "name": "RaceUpdate_3_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 0,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 407.031,
+        "name": "RaceUpdate_0_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 4,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 455.664,
+        "name": "RaceUpdate_4_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 1,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 434.904,
+        "name": "RaceUpdate_1_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 11,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 484.76,
+        "name": "RaceUpdate_11_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 5,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 462.01,
+        "name": "RaceUpdate_5_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 2,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 487.798,
+        "name": "RaceUpdate_2_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 13,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 479.148,
+        "name": "RaceUpdate_13_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 9,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 484.419,
+        "name": "RaceUpdate_9_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 10,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 486.952,
+        "name": "RaceUpdate_10_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 7,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 491.806,
+        "name": "RaceUpdate_7_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 8,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 496.203,
+        "name": "RaceUpdate_8_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 6,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 488.001,
+        "name": "RaceUpdate_6_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 17,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 474.522,
+        "name": "RaceUpdate_17_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 15,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 475.804,
+        "name": "RaceUpdate_15_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 14,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 477.142,
+        "name": "RaceUpdate_14_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 12,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 489.576,
+        "name": "RaceUpdate_12_20260404112359",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 16,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 451.828,
+        "name": "RaceUpdate_16_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 18,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 432.432,
+        "name": "RaceUpdate_18_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 19,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 431.961,
+        "name": "RaceUpdate_19_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 21,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 238.133,
+        "name": "RaceUpdate_21_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 20,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 251.522,
+        "name": "RaceUpdate_20_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 22,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 241.123,
+        "name": "RaceUpdate_22_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 23,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 265.361,
+        "name": "RaceUpdate_23_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 24,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 278.774,
+        "name": "RaceUpdate_24_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 26,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 279.631,
+        "name": "RaceUpdate_26_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 29,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 280.731,
+        "name": "RaceUpdate_29_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 25,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 315.057,
+        "name": "RaceUpdate_25_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 27,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 297.159,
+        "name": "RaceUpdate_27_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 32,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 275.781,
+        "name": "RaceUpdate_32_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 33,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 282.668,
+        "name": "RaceUpdate_33_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 28,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 286.141,
+        "name": "RaceUpdate_28_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 30,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 285.22,
+        "name": "RaceUpdate_30_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 31,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 269.683,
+        "name": "RaceUpdate_31_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 34,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 272.444,
+        "name": "RaceUpdate_34_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 35,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 283.042,
+        "name": "RaceUpdate_35_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 37,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 244.317,
+        "name": "RaceUpdate_37_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 36,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 288.919,
+        "name": "RaceUpdate_36_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 39,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 228.447,
+        "name": "RaceUpdate_39_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 38,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 252.132,
+        "name": "RaceUpdate_38_20260404112400",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 42,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 148.02,
+        "name": "RaceUpdate_42_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 40,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 192.419,
+        "name": "RaceUpdate_40_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 43,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 166.32,
+        "name": "RaceUpdate_43_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 41,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 162.713,
+        "name": "RaceUpdate_41_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 46,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 156.42,
+        "name": "RaceUpdate_46_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 44,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 182.922,
+        "name": "RaceUpdate_44_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 45,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 164.691,
+        "name": "RaceUpdate_45_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 50,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 188.313,
+        "name": "RaceUpdate_50_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 47,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 175.079,
+        "name": "RaceUpdate_47_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 48,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 166.868,
+        "name": "RaceUpdate_48_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 49,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 173.477,
+        "name": "RaceUpdate_49_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 52,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 177.865,
+        "name": "RaceUpdate_52_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 51,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 172.913,
+        "name": "RaceUpdate_51_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 53,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 158.428,
+        "name": "RaceUpdate_53_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 54,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 139.343,
+        "name": "RaceUpdate_54_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 55,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 131.524,
+        "name": "RaceUpdate_55_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 56,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 126.636,
+        "name": "RaceUpdate_56_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 57,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 137.589,
+        "name": "RaceUpdate_57_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 58,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 86.233,
+        "name": "RaceUpdate_58_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      },
+      {
+        "i": 59,
+        "op": "update",
+        "ok": true,
+        "status": 200,
+        "time_ms": 116.996,
+        "name": "RaceUpdate_59_20260404112401",
+        "response": {
+          "message": "Member updated"
+        }
+      }
+    ]
+  },
+  "failure_simulation_test": {
+    "seed_create": {
+      "status": 200,
+      "data": {
+        "member_id": 34,
+        "message": "Member created"
+      }
+    },
+    "forced_failure_create": {
+      "status": 500,
+      "data": {
+        "error": "(1062, \"Duplicate entry 'rf_dup_20260404112402' for key 'user_credentials.username'\")"
+      }
+    },
+    "verification": {
+      "seed_create_succeeded": true,
+      "forced_failure_was_not_success": true,
+      "failed_create_did_not_leave_member_row": true,
+      "rollback_test_valid": true,
+      "rollback_verified": true
+    },
+    "cleanup_seed": {
+      "status": 200,
+      "data": {
+        "message": "Member deleted"
+      }
+    }
+  },
+  "verdict": {
+    "module_b_part": "race_condition_and_failure_simulation",
+    "overall": "PASS",
+    "checks": {
+      "race_last_write_wins_sanity": true,
+      "failure_rollback": true
+    },
+    "acid_mapping": {
+      "atomicity": "failure_rollback",
+      "consistency": "last_write_wins_legitimate + no_5xx",
+      "isolation": "basic concurrent sanity only (does not detect lost updates)",
+      "durability": "not validated by this script"
+    },
+    "notes": [
+      "last-write-wins is treated as acceptable for this assignment level",
+      "this script validates winner legitimacy, not strict conflict-serializable isolation"
+    ],
+    "reasons": []
+  }
+}

@@ -32,7 +32,7 @@ window.location.href="/home"
 
 else{
 
-alert("Invalid login")
+alert(data.error);
 
 }
 

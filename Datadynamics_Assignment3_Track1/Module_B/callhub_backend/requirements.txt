@@ -6,3 +6,4 @@ requests
 matplotlib
 flask_mysqldb
 bcrypt
+locust

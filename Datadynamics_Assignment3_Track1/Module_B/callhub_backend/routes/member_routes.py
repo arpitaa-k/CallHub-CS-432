@@ -423,6 +423,15 @@ def update_member(id):
     cur = mysql.connection.cursor()
 
     try:
+        # Lock active target row to avoid update/delete race on the same member.
+        cur.execute("SELECT member_id FROM Members WHERE member_id=%s AND is_deleted=0 FOR UPDATE", (id,))
+        existing = cur.fetchone()
+        if not existing:
+            return {"error": "Member not found or already deleted"}, 404
+
+        category_id = None
+        role_id = None
+
         # Get category_id
         if category_name:
             cur.execute("SELECT category_id FROM Data_Categories WHERE category_name = %s", (category_name,))
@@ -437,8 +446,14 @@ def update_member(id):
 
         # Update Member
         cur.execute("""
-            UPDATE Members SET full_name=%s, designation=%s, age=%s, gender=%s, join_date=%s WHERE member_id=%s
+            UPDATE Members
+            SET full_name=%s, designation=%s, age=%s, gender=%s, join_date=%s
+            WHERE member_id=%s AND is_deleted=0
         """, (full_name, designation, age, gender, join_date, id))
+
+        if cur.rowcount == 0:
+            mysql.connection.rollback()
+            return {"error": "Member not found or already deleted"}, 404
 
         # Update Contact_Details
         if category_id:
@@ -501,18 +516,31 @@ def delete_member(id):
 
     cur = mysql.connection.cursor()
 
-    cur.execute("""
-        UPDATE Members
-        SET is_deleted=1,
-            deleted_at=NOW()
-        WHERE member_id=%s
-    """,(id,))
+    try:
+        # Lock active row first so concurrent update/delete requests serialize correctly.
+        cur.execute("SELECT member_id FROM Members WHERE member_id=%s AND is_deleted=0 FOR UPDATE", (id,))
+        existing = cur.fetchone()
+        if not existing:
+            return {"error": "Member not found or already deleted"}, 404
 
-    mysql.connection.commit()
+        cur.execute("""
+            UPDATE Members
+            SET is_deleted=1,
+                deleted_at=NOW()
+            WHERE member_id=%s AND is_deleted=0
+        """, (id,))
 
-    log_action(actor_id, "Members", id, "SOFT_DELETE")
+        if cur.rowcount == 0:
+            mysql.connection.rollback()
+            return {"error": "Member not found or already deleted"}, 404
 
-    return {"message":"Member deleted"}
+        mysql.connection.commit()
+        log_action(actor_id, "Members", id, "SOFT_DELETE")
+        return {"message": "Member deleted"}
+    except Exception as e:
+        mysql.connection.rollback()
+        return {"error": str(e)}, 500
+
     #Log search
     if log:
         cur.execute("""

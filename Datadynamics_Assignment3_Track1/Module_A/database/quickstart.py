@@ -144,6 +144,7 @@ def example_student_enrollment():
     dm = DatabaseManager()
     txm = TransactionManager(dm)
     initialize_module_a_schema(dm, "StudentDemo")
+    populate_sample_data(txm, "StudentDemo")
     
     print("\nEnrolling new student Priya Sharma...")
     
@@ -217,6 +218,7 @@ def example_concurrent_operations():
     dm = DatabaseManager()
     txm = TransactionManager(dm)
     initialize_module_a_schema(dm, "ConcurrentDemo")
+    populate_sample_data(txm, "ConcurrentDemo")
     
     # Setup: Insert a member for concurrent access
     setup_txn = txm.begin_transaction()

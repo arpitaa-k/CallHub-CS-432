@@ -150,8 +150,16 @@ python main.py
 Open your browser and go to the link showed after running this file.
 
 ---
+## Core Features  
 
-##  Core Features  
+**Module A :**
+- **O(log n) Lookups:** Custom B+ Tree structure for ultra-fast primary key searching and efficient range queries.
+- **Database Management:** Ability to create, list, and delete multiple databases and tables (via `DatabaseManager`).
+- **Schema Validation:** Strict type-checking and required-column enforcement for all records via `Table` objects.
+- **Visualizations:** Generates structural diagrams of the B+ Tree using Graphviz to visualize node splits and merges.
+- **Comprehensive Benchmarking:** Analyzes Insertion, Deletion, Range Query, and Peak Memory performance against a baseline brute-force approach.
+
+**Module B:**
 
 - Authentication using sessions  
 - Member CRUD operations  
@@ -161,7 +169,6 @@ Open your browser and go to the link showed after running this file.
 - Audit logging (database + file)  
 - Performance benchmarking and indexing  
 
----
 
 ##  Benchmarking  
 

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Member</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .page-shell {
+            max-width: 1180px;
+            margin: 0 auto 28px;
+            padding: 0 10px;
+        }
+
+        .role-selection,
+        #searchScreenDiv,
+        #confirmationDiv {
+            max-width: 1080px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 18px;
+            box-shadow: 0 14px 30px rgba(2, 8, 23, 0.12);
+            padding: 24px;
+        }
+
+        .role-selection { text-align: center; }
+
+        #roleButtons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .role-btn { margin: 0; padding: 10px 22px; font-size: 16px; cursor: pointer; }
+
+        .search-bar {
+            position: relative;
+            margin: 12px 0 0;
+        }
+
+        #search {
+            min-width: 320px;
+            width: min(520px, 100%);
+        }
+
+        #suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #dbe3ee;
+            border-radius: 10px;
+            max-height: 220px;
+            overflow-y: auto;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+        }
+
+        .suggestion-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .suggestion-item:hover { background: #ecfeff; }
+
+        .delete-btn { background-color: #d9534f; color: white; }
+        .delete-btn:hover { background-color: #c9302c; }
+
+        #confirmationDiv p {
+            color: #0f172a;
+        }
+
+        #confirmationDiv h3,
+        #searchScreenDiv h3,
+        .role-selection h3 {
+            color: #0f172a !important;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Delete Member</h2>
+
+<p id="msg"></p>
+
+<div class="page-shell">
+
+<!-- Role Selection Screen -->
+<div id="roleSelectionDiv" class="role-selection">
+    <h3>Select Role to Delete</h3>
+    <div id="roleButtons"></div>
+</div>
+
+<!-- Search Screen (shown after role selection) -->
+<div id="searchScreenDiv" style="display: none;">
+    <h3>Search Members to Delete</h3>
+    
+    <div class="search-bar">
+        <input type="text" id="search" placeholder="Enter member name" oninput="onNameInput()">
+        <div id="suggestions"></div>
+    </div>
+    
+    <button onclick="backToRoles()">Back to Roles</button>
+</div>
+
+<!-- Confirmation Screen (shown after member selection) -->
+<div id="confirmationDiv" style="display: none; text-align: center; margin-top: 30px;">
+    <h3>Confirm Delete</h3>
+    <p>Are you sure you want to delete <strong id="memberNameDisplay"></strong>?</p>
+    <p style="color: red; font-weight: bold;">This action cannot be undone.</p>
+    <button class="delete-btn" onclick="confirmDelete()">Yes, Delete</button>
+    <button onclick="backToSearch()">No, Cancel</button>
+</div>
+
+</div>
+
+<script>
+
+let selectedRole = "";
+let selectedMemberId = "";
+let suggestionTimer;
+
+function backToRoles() {
+    selectedRole = "";
+    selectedMemberId = "";
+    document.getElementById("search").value = "";
+    document.getElementById("suggestions").style.display = "none";
+    document.getElementById("roleSelectionDiv").style.display = "block";
+    document.getElementById("searchScreenDiv").style.display = "none";
+    document.getElementById("confirmationDiv").style.display = "none";
+}
+
+function backToSearch() {
+    document.getElementById("search").value = "";
+    document.getElementById("suggestions").style.display = "none";
+    document.getElementById("searchScreenDiv").style.display = "block";
+    document.getElementById("confirmationDiv").style.display = "none";
+}
+
+// Fetch editable roles
+fetch("/editable-roles", { credentials: "include" })
+.then(res=>res.json())
+.then(data=>{
+    const roleDiv = document.getElementById("roleButtons");
+    roleDiv.innerHTML = "";
+    
+    if (!data || data.length === 0) {
+        document.getElementById("msg").innerText = "You do NOT have access to delete members";
+        document.getElementById("roleSelectionDiv").style.display = "none";
+        return;
+    }
+    
+    data.forEach(role => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "role-btn";
+        btn.innerText = role.role_title;
+        btn.onclick = () => selectRole(role.role_title);
+        roleDiv.appendChild(btn);
+    });
+})
+
+function selectRole(roleTitle) {
+    selectedRole = roleTitle;
+    document.getElementById("roleSelectionDiv").style.display = "none";
+    document.getElementById("searchScreenDiv").style.display = "block";
+}
+
+function onNameInput() {
+    clearTimeout(suggestionTimer);
+
+    const name = document.getElementById("search").value;
+    if (!name) {
+        clearSuggestions();
+        return;
+    }
+
+    suggestionTimer = setTimeout(() => {
+        fetchMembers();
+    }, 250);
+}
+
+function clearSuggestions() {
+    const suggestions = document.getElementById("suggestions");
+    suggestions.style.display = "none";
+    suggestions.innerHTML = "";
+}
+
+function fetchMembers() {
+    const name = document.getElementById("search").value;
+    const role = selectedRole;
+
+    if (!role) {
+        alert("Please select a role");
+        return;
+    }
+
+    const url = `/search?name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&log=false`;
+
+    fetch(url, { credentials: "include" })
+        .then(res => {
+            if (res.status === 403) {
+                document.getElementById("msg").innerText = "Access Denied";
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            setSuggestions(data);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
+function setSuggestions(data) {
+    const suggestions = document.getElementById("suggestions");
+
+    if (!data || data.length === 0) {
+        clearSuggestions();
+        return;
+    }
+
+    suggestions.style.display = "block";
+    suggestions.innerHTML = data
+        .map(member => `
+            <div class="suggestion-item" data-id="${member.member_id}" onclick="selectMember(${member.member_id}, '${member.full_name}')">
+                <strong>${member.full_name}</strong> (${member.designation}) - Frequency: ${member.frequency}
+            </div>
+        `)
+        .join("");
+}
+
+function selectMember(memberId, memberName) {
+    selectedMemberId = memberId;
+    document.getElementById("memberNameDisplay").innerText = memberName;
+    clearSuggestions();
+    
+    document.getElementById("searchScreenDiv").style.display = "none";
+    document.getElementById("confirmationDiv").style.display = "block";
+}
+
+function confirmDelete() {
+    fetch(`/members/${selectedMemberId}`, {
+        method: "DELETE",
+        credentials: "include"
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.message) {
+            window.location.href = "/success";
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(err => {
+        alert("Error deleting member: " + err.message);
+    });
+}
+
+</script>
+
+</body>
+</html>
+

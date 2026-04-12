@@ -1,0 +1,623 @@
+/* Profile and Home Redesign */
+.profile-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.profile-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.profile-name {
+    font-weight: bold;
+    font-size: 16px;
+    color: #fff;
+}
+.logout-btn-red {
+    background: #e53935;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 18px;
+    font-size: 15px;
+    margin-top: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+.logout-btn-red:hover {
+    background: #b71c1c;
+}
+
+.home-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 80vh;
+}
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 32px 0 24px 0;
+    color: #222;
+    text-align: center;
+}
+.portfolio-card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding: 24px 36px;
+    margin-bottom: 32px;
+    gap: 24px;
+    min-width: 340px;
+}
+.portfolio-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.portfolio-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.portfolio-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #222;
+}
+.portfolio-role {
+    font-size: 1rem;
+    color: #666;
+}
+.portfolio-id {
+    font-size: 0.95rem;
+    color: #888;
+}
+.action-buttons {
+    display: flex;
+    gap: 18px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.action-btn {
+    background: #ff6b35;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.2s;
+    margin-bottom: 8px;
+}
+.action-btn.main {
+    background: #2e7d32;
+}
+.action-btn:hover {
+    background: #e85c2c;
+}
+/* MODAL DIALOG */
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: #fff;
+    padding: 32px 32px 24px 32px;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    min-width: 320px;
+    text-align: center;
+}
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 24px;
+    display: block;
+}
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.modal-btn {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.modal-btn.confirm {
+    background: #ff6b35;
+    color: #fff;
+}
+.modal-btn.cancel {
+    background: #eee;
+    color: #333;
+}
+/* LOGIN PAGE BACKGROUND */
+
+.login-page{
+
+margin:0;
+height:100vh;
+
+background-image:url("https://news.iitgn.ac.in/wp/wp-content/uploads/2019/07/ANK383_2224a-1280x640.jpg");
+background-size:cover;
+background-position:center;
+
+font-family:Arial;
+
+}
+
+/* DARK OVERLAY (60% visibility) */
+
+.overlay{
+
+width:100%;
+height:100%;
+
+background:rgba(0,0,0,0.6);
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+}
+
+/* LOGIN BOX */
+
+.login-box{
+
+background:white;
+
+padding:40px;
+width:320px;
+
+border-radius:8px;
+
+box-shadow:0px 5px 20px rgba(0,0,0,0.3);
+
+text-align:center;
+
+}
+
+/* INPUT */
+
+.login-box input{
+
+width:100%;
+padding:10px;
+margin:10px 0;
+
+border:1px solid #ccc;
+border-radius:5px;
+
+}
+
+/* BUTTON */
+
+.login-box button{
+
+width:100%;
+padding:10px;
+
+background:#ff6b35;
+color:white;
+
+border:none;
+border-radius:5px;
+
+font-size:16px;
+cursor:pointer;
+
+}
+
+.login-box button:hover{
+
+background:#e85c2c;
+
+}
+
+/* PAGE BACKGROUND */
+
+.home-page{
+
+margin:0;
+
+background-image:url("../images/bg.jpg");
+background-size:cover;
+background-position:center;
+
+font-family:Arial;
+
+}
+
+/* HEADER */
+
+.header{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+background:rgba(0,0,0,0.7);
+color:white;
+
+padding:15px 30px;
+
+}
+
+.logo{
+
+display:flex;
+align-items:center;
+gap:10px;
+
+font-size:18px;
+
+}
+
+.user{
+
+font-weight:bold;
+
+}
+
+/* BODY */
+
+.content{
+
+padding:30px;
+
+}
+
+/* SCROLLABLE DATABASE AREA */
+
+.table-container{
+
+max-height:350px;
+
+overflow-y:auto;
+
+background:white;
+
+padding:20px;
+
+border-radius:6px;
+
+}
+
+/* TABLE */
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+th,td{
+
+padding:10px;
+
+border-bottom:1px solid #ddd;
+
+}
+
+/* FOOTER CRUD */
+
+.footer{
+
+display:flex;
+
+justify-content:space-around;
+
+padding:20px;
+
+background:rgba(0,0,0,0.8);
+
+position:fixed;
+
+bottom:0;
+
+width:100%;
+
+}
+
+.crud-box{
+
+background:#ff6b35;
+
+color:white;
+
+padding:15px 25px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+}
+
+.crud-box a{
+
+color:white;
+
+text-decoration:none;
+
+font-weight:bold;
+
+}
+
+
+body
+{
+    font-family: Arial;
+    background-color: #f5f5f5;
+    margin: 0;
+}
+
+.header
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0,0,0,0.7);
+    color: white;
+    padding: 15px;
+}
+
+.logo
+{
+    height: 50px;
+}
+
+.user-info
+{
+    font-size: 16px;
+}
+
+.container
+{
+    width: 70%;
+    margin: auto;
+    margin-top: 50px;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+}
+
+button
+{
+    padding: 10px 20px;
+    background-color: #ff6b35;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover
+{
+    background-color: #ff6b35;
+}
+
+input
+{
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+}
+
+table
+{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td
+{
+    border: 1px solid gray;
+    padding: 10px;
+}
+
+/* Unified non-login theme (blue-black palette) */
+body:not(.login-page) {
+    --theme-bg-a: #0f172a;
+    --theme-bg-b: #111827;
+    --theme-panel: #ffffff;
+    --theme-soft: #f8fafc;
+    --theme-line: #dbe3ee;
+    --theme-text: #0b1220;
+    --theme-muted: #516074;
+    --theme-accent: #0ea5a6;
+    --theme-accent-2: #0891b2;
+    --theme-danger: #dc2626;
+    --theme-shadow: 0 20px 45px rgba(2, 8, 23, 0.2);
+
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Manrope', 'Segoe UI', sans-serif;
+    color: var(--theme-text);
+    background:
+        radial-gradient(circle at 12% 20%, rgba(14, 165, 166, 0.16), transparent 32%),
+        radial-gradient(circle at 86% 12%, rgba(59, 130, 246, 0.18), transparent 34%),
+        linear-gradient(135deg, var(--theme-bg-a), var(--theme-bg-b));
+}
+
+body:not(.login-page) .header {
+    background: rgba(15, 23, 42, 0.82);
+    backdrop-filter: blur(3px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body:not(.login-page) .content,
+body:not(.login-page) .container,
+body:not(.login-page) #searchScreenDiv,
+body:not(.login-page) #confirmationDiv,
+body:not(.login-page) #portfolio-data,
+body:not(.login-page) .table-container {
+    background: var(--theme-panel);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 18px;
+    box-shadow: var(--theme-shadow);
+}
+
+body:not(.login-page) .container {
+    width: min(980px, 92vw);
+}
+
+body:not(.login-page) > h1,
+body:not(.login-page) > h2,
+body:not(.login-page) > h3,
+body:not(.login-page) > h4 {
+    color: #e2e8f0;
+}
+
+/* Standard top spacing for plain page headings like Delete/Read screens */
+body:not(.login-page) > h2 {
+    max-width: 980px;
+    margin: 26px auto 14px;
+    padding: 0 6px;
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    font-weight: 800;
+}
+
+body:not(.login-page) .content h1,
+body:not(.login-page) .content h2,
+body:not(.login-page) .content h3,
+body:not(.login-page) .content h4,
+body:not(.login-page) .container h1,
+body:not(.login-page) .container h2,
+body:not(.login-page) .container h3,
+body:not(.login-page) .container h4,
+body:not(.login-page) .panel h1,
+body:not(.login-page) .panel h2,
+body:not(.login-page) .panel h3,
+body:not(.login-page) .panel h4,
+body:not(.login-page) .table-panel h1,
+body:not(.login-page) .table-panel h2,
+body:not(.login-page) .table-panel h3,
+body:not(.login-page) .table-panel h4,
+body:not(.login-page) #portfolio-details h1,
+body:not(.login-page) #portfolio-details h2,
+body:not(.login-page) #portfolio-details h3,
+body:not(.login-page) #portfolio-details h4,
+body:not(.login-page) .role-selection h1,
+body:not(.login-page) .role-selection h2,
+body:not(.login-page) .role-selection h3,
+body:not(.login-page) .role-selection h4,
+body:not(.login-page) #searchScreenDiv h1,
+body:not(.login-page) #searchScreenDiv h2,
+body:not(.login-page) #searchScreenDiv h3,
+body:not(.login-page) #searchScreenDiv h4,
+body:not(.login-page) #confirmationDiv h1,
+body:not(.login-page) #confirmationDiv h2,
+body:not(.login-page) #confirmationDiv h3,
+body:not(.login-page) #confirmationDiv h4,
+body:not(.login-page) .actions-panel h1,
+body:not(.login-page) .actions-panel h2,
+body:not(.login-page) .actions-panel h3,
+body:not(.login-page) .actions-panel h4,
+body:not(.login-page) .modal-content h1,
+body:not(.login-page) .modal-content h2,
+body:not(.login-page) .modal-content h3,
+body:not(.login-page) .modal-content h4,
+body:not(.login-page) .modal-content .modal-title {
+    color: var(--theme-text);
+}
+
+body:not(.login-page) .container h1,
+body:not(.login-page) .container h2,
+body:not(.login-page) .container h3,
+body:not(.login-page) .container h4,
+body:not(.login-page) #portfolio-data h1,
+body:not(.login-page) #portfolio-data h2,
+body:not(.login-page) #portfolio-data h3,
+body:not(.login-page) #portfolio-data h4,
+body:not(.login-page) .content h1,
+body:not(.login-page) .content h2,
+body:not(.login-page) .content h3,
+body:not(.login-page) .content h4 {
+    color: var(--theme-text);
+}
+
+body:not(.login-page) p,
+body:not(.login-page) li,
+body:not(.login-page) td,
+body:not(.login-page) th {
+    color: var(--theme-text);
+}
+
+body:not(.login-page) input,
+body:not(.login-page) select {
+    background: var(--theme-soft);
+    border: 1px solid var(--theme-line);
+    border-radius: 10px;
+}
+
+body:not(.login-page) input:focus,
+body:not(.login-page) select:focus {
+    outline: none;
+    border-color: #22d3ee;
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
+}
+
+body:not(.login-page) button,
+body:not(.login-page) .action-btn,
+body:not(.login-page) .crud-box,
+body:not(.login-page) .modal-btn.confirm,
+body:not(.login-page) .logout-btn,
+body:not(.login-page) .logout-btn-red {
+    background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-2));
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+}
+
+body:not(.login-page) .action-btn:hover,
+body:not(.login-page) .crud-box:hover,
+body:not(.login-page) button:hover,
+body:not(.login-page) .modal-btn.confirm:hover,
+body:not(.login-page) .logout-btn:hover,
+body:not(.login-page) .logout-btn-red:hover {
+    filter: brightness(1.06);
+}
+
+body:not(.login-page) .modal-btn.cancel {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+body:not(.login-page) .footer {
+    background: rgba(15, 23, 42, 0.82);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body:not(.login-page) .suggestion-item:hover {
+    background: #ecfeff;
+}

@@ -1,0 +1,10 @@
+Flask
+mysql-connector-python
+dotenv
+Faker
+requests
+matplotlib
+flask_mysqldb
+bcrypt
+locust
+PyJWT

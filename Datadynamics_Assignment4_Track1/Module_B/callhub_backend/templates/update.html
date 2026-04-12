@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Member</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap');
+
+        :root {
+            --bg-a: #0f172a;
+            --bg-b: #1f2937;
+            --panel: #ffffff;
+            --panel-soft: #f8fafc;
+            --line: #dbe3ee;
+            --text: #0b1220;
+            --muted: #516074;
+            --accent: #0ea5a6;
+            --accent-dark: #0b8b8c;
+            --danger: #dc2626;
+            --shadow: 0 20px 45px rgba(2, 8, 23, 0.18);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Manrope', 'Trebuchet MS', sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 10% 20%, rgba(14, 165, 166, 0.2), transparent 30%),
+                radial-gradient(circle at 85% 15%, rgba(56, 189, 248, 0.18), transparent 28%),
+                linear-gradient(140deg, var(--bg-a), var(--bg-b));
+            padding: 24px;
+        }
+
+        h2#pageTitle {
+            margin: 8px auto 18px;
+            max-width: 980px;
+            font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+            font-weight: 800;
+            color: #e2e8f0;
+        }
+
+        #msg {
+            max-width: 980px;
+            margin: 0 auto 14px;
+            color: #fecaca;
+            font-weight: 700;
+        }
+
+        form,
+        .role-selection,
+        #searchScreenDiv {
+            max-width: 980px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        h3 {
+            margin: 24px 0 10px;
+            padding-top: 8px;
+            border-top: 1px solid var(--line);
+            font-size: 1.03rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        h3:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+
+        p { margin: 6px 0 10px; color: var(--muted); }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.92rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            margin-top: 6px;
+            padding: 11px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: var(--panel-soft);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #22d3ee;
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
+            background: #fff;
+        }
+
+        button {
+            margin-top: 12px;
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent), #0891b2);
+            transition: transform 0.15s ease, filter 0.2s ease;
+        }
+
+        button:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+
+        #roleButtons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 14px;
+        }
+
+        .role-btn {
+            margin: 0;
+            min-width: 160px;
+            background: linear-gradient(135deg, #0369a1, #0284c7);
+        }
+
+        .search-bar { position: relative; margin: 12px 0 14px; }
+
+        #suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            max-height: 220px;
+            overflow-y: auto;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .suggestion-item:hover { background: #f0f9ff; }
+
+        .contact-row,
+        .location-row,
+        .emergency-row {
+            border: 1px solid var(--line) !important;
+            border-radius: 14px;
+            background: #fbfdff;
+            padding: 14px !important;
+            margin-top: 12px !important;
+        }
+
+        .contact-row button,
+        .location-row button,
+        .emergency-row button {
+            background: linear-gradient(135deg, #ef4444, var(--danger));
+            margin-top: 14px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 14px; }
+            form,
+            .role-selection,
+            #searchScreenDiv { padding: 16px; border-radius: 16px; }
+            .role-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<h2 id="pageTitle">Update Member</h2>
+
+<p id="msg"></p>
+
+<!-- Role Selection Screen -->
+<div id="roleSelectionDiv" class="role-selection">
+    <h3>Select Role to Update</h3>
+    <div id="roleButtons"></div>
+</div>
+
+<!-- Search Screen (shown after role selection) -->
+<div id="searchScreenDiv" style="display: none;">
+    <h3>Search Members</h3>
+    
+    <div class="search-bar">
+        <input type="text" id="search" placeholder="Enter member name" oninput="onNameInput()">
+        <div id="suggestions"></div>
+    </div>
+    
+    <button onclick="backToRoles()">Back to Roles</button>
+</div>
+
+<!-- Update Form (shown after member selection) -->
+<form id="updateForm" style="display: none;">
+
+    <h3>Category</h3>
+    <p>Category is set per contact/location/emergency entry below.</p>
+
+    <h3>Role</h3>
+    <label>Role Title</label>
+    <select id="role_title" required disabled>
+        <option id="selectedRole" value=""></option>
+    </select>
+
+    <h3>Member Details</h3>
+    <label>Full Name</label>
+    <input type="text" id="full_name" required>
+
+    <label>Designation</label>
+    <input type="text" id="designation" required>
+
+    <label>Age</label>
+    <input type="number" id="age" required>
+
+    <label>Gender</label>
+    <select id="gender" required>
+        <option value="">Select Gender</option>
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+        <option value="O">Other</option>
+    </select>
+
+    <label>Join Date</label>
+    <input type="date" id="join_date" required>
+
+    <h3>Contacts</h3>
+    <label>Assign Date (optional)</label>
+    <input type="date" id="assign_date">
+    <div id="contactsContainer"></div>
+    <button type="button" onclick="addContactRow()">+ Add Contact</button>
+
+    <h3>Locations</h3>
+    <div id="locationsContainer"></div>
+    <button type="button" onclick="addLocationRow()">+ Add Location</button>
+
+    <h3>Emergency Contacts</h3>
+    <div id="emergencyContainer"></div>
+    <button type="button" onclick="addEmergencyRow()">+ Add Emergency Contact</button>
+
+    <h3>Credentials</h3>
+    <label>Username</label>
+    <input type="text" id="username" required>
+
+    <label>Password (leave blank to keep current)</label>
+    <input type="password" id="password">
+
+    <button type="submit">Update Member</button>
+    <button type="button" onclick="backToSearch()">Back</button>
+
+</form>
+
+<script>
+
+let selectedRole = "";
+let selectedMemberId = "";
+let suggestionTimer;
+let originalMemberData = null;
+
+function stableStringify(value) {
+    return JSON.stringify(value ?? null);
+}
+
+function categoryOptions() {
+    return `
+        <option value="">Select Category</option>
+        <option>Public</option>
+        <option>Residential</option>
+        <option>Academic</option>
+        <option>Confidential</option>
+        <option>Emergency</option>
+    `;
+}
+
+function addContactRow(prefill = {}) {
+    const div = document.createElement("div");
+    div.className = "contact-row";
+    div.style.border = "1px solid #ddd";
+    div.style.padding = "10px";
+    div.style.marginTop = "10px";
+    div.innerHTML = `
+        <label>Contact Type</label>
+        <select class="contact_type" required>
+            <option value="">Select Type</option>
+            <option value="Mobile">Mobile</option>
+            <option value="Personal Email">Personal Email</option>
+            <option value="Landline">Landline</option>
+            <option value="Official Email">Official Email</option>
+        </select>
+        <label>Contact Value</label>
+        <input type="text" class="contact_value" required>
+        <label>Category</label>
+        <select class="contact_category" required>${categoryOptions()}</select>
+        <button type="button" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    document.getElementById("contactsContainer").appendChild(div);
+    if (prefill.contact_type) div.querySelector(".contact_type").value = prefill.contact_type;
+    if (prefill.contact_value) div.querySelector(".contact_value").value = prefill.contact_value;
+    if (prefill.category_name) div.querySelector(".contact_category").value = prefill.category_name;
+}
+
+function addLocationRow(prefill = {}) {
+    const div = document.createElement("div");
+    div.className = "location-row";
+    div.style.border = "1px solid #ddd";
+    div.style.padding = "10px";
+    div.style.marginTop = "10px";
+    div.innerHTML = `
+        <label>Location Type</label>
+        <select class="location_type" required>
+            <option value="">Select Type</option>
+            <option>Office</option>
+            <option>Hostel Room</option>
+            <option>Lab</option>
+            <option>Residence</option>
+            <option>Post</option>
+        </select>
+        <label>Building Name</label>
+        <input type="text" class="building_name" required>
+        <label>Room Number</label>
+        <input type="text" class="room_number" required>
+        <label>Category</label>
+        <select class="location_category" required>${categoryOptions()}</select>
+        <button type="button" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    document.getElementById("locationsContainer").appendChild(div);
+    if (prefill.location_type) div.querySelector(".location_type").value = prefill.location_type;
+    if (prefill.building_name) div.querySelector(".building_name").value = prefill.building_name;
+    if (prefill.room_number) div.querySelector(".room_number").value = prefill.room_number;
+    if (prefill.category_name) div.querySelector(".location_category").value = prefill.category_name;
+}
+
+function addEmergencyRow(prefill = {}) {
+    const div = document.createElement("div");
+    div.className = "emergency-row";
+    div.style.border = "1px solid #ddd";
+    div.style.padding = "10px";
+    div.style.marginTop = "10px";
+    div.innerHTML = `
+        <label>Person Name</label>
+        <input type="text" class="emergency_name" required>
+        <label>Relation</label>
+        <input type="text" class="relation" required>
+        <label>Contact Number</label>
+        <input type="text" class="emergency_phone" required>
+        <label>Category</label>
+        <select class="emergency_category" required>${categoryOptions()}</select>
+        <button type="button" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    document.getElementById("emergencyContainer").appendChild(div);
+    if (prefill.contact_person_name) div.querySelector(".emergency_name").value = prefill.contact_person_name;
+    if (prefill.relation) div.querySelector(".relation").value = prefill.relation;
+    if (prefill.emergency_phone) div.querySelector(".emergency_phone").value = prefill.emergency_phone;
+    if (prefill.category_name) div.querySelector(".emergency_category").value = prefill.category_name;
+}
+
+function collectContacts() {
+    return Array.from(document.querySelectorAll("#contactsContainer .contact-row")).map(row => ({
+        contact_type: row.querySelector(".contact_type").value,
+        contact_value: row.querySelector(".contact_value").value,
+        category_name: row.querySelector(".contact_category").value
+    }));
+}
+
+function collectLocations() {
+    return Array.from(document.querySelectorAll("#locationsContainer .location-row")).map(row => ({
+        location_type: row.querySelector(".location_type").value,
+        building_name: row.querySelector(".building_name").value,
+        room_number: row.querySelector(".room_number").value,
+        category_name: row.querySelector(".location_category").value
+    }));
+}
+
+function collectEmergencyContacts() {
+    return Array.from(document.querySelectorAll("#emergencyContainer .emergency-row")).map(row => ({
+        contact_person_name: row.querySelector(".emergency_name").value,
+        relation: row.querySelector(".relation").value,
+        emergency_phone: row.querySelector(".emergency_phone").value,
+        category_name: row.querySelector(".emergency_category").value
+    }));
+}
+
+function backToRoles() {
+    selectedRole = "";
+    selectedMemberId = "";
+    document.getElementById("search").value = "";
+    document.getElementById("suggestions").style.display = "none";
+    document.getElementById("roleSelectionDiv").style.display = "block";
+    document.getElementById("searchScreenDiv").style.display = "none";
+    document.getElementById("updateForm").style.display = "none";
+}
+
+function backToSearch() {
+    document.getElementById("search").value = "";
+    document.getElementById("suggestions").style.display = "none";
+    document.getElementById("searchScreenDiv").style.display = "block";
+    document.getElementById("updateForm").style.display = "none";
+}
+
+// Fetch editable roles
+fetch("/editable-roles", { credentials: "include" })
+.then(res=>res.json())
+.then(data=>{
+    const roleDiv = document.getElementById("roleButtons");
+    roleDiv.innerHTML = "";
+    
+    if (!data || data.length === 0) {
+        document.getElementById("msg").innerText = "You do NOT have access to update members";
+        document.getElementById("roleSelectionDiv").style.display = "none";
+        return;
+    }
+    
+    data.forEach(role => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "role-btn";
+        btn.innerText = role.role_title;
+        btn.onclick = () => selectRole(role.role_title);
+        roleDiv.appendChild(btn);
+    });
+})
+
+function selectRole(roleTitle) {
+    selectedRole = roleTitle;
+    document.getElementById("selectedRole").value = roleTitle;
+    document.getElementById("selectedRole").text = roleTitle;
+    document.getElementById("roleSelectionDiv").style.display = "none";
+    document.getElementById("searchScreenDiv").style.display = "block";
+}
+
+function onNameInput() {
+    clearTimeout(suggestionTimer);
+
+    const name = document.getElementById("search").value;
+    if (!name) {
+        clearSuggestions();
+        return;
+    }
+
+    suggestionTimer = setTimeout(() => {
+        fetchMembers(false);
+    }, 250);
+}
+
+function clearSuggestions() {
+    const suggestions = document.getElementById("suggestions");
+    suggestions.style.display = "none";
+    suggestions.innerHTML = "";
+}
+
+function fetchMembers(log = false) {
+    const name = document.getElementById("search").value;
+    const role = selectedRole;
+
+    if (!role) {
+        alert("Please select a role");
+        return;
+    }
+
+    const url = `/search?name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&log=${log}`;
+
+    fetch(url, { credentials: "include" })
+        .then(res => {
+            if (res.status === 403) {
+                document.getElementById("msg").innerText = "Access Denied";
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+
+            if (log) {
+                clearSuggestions();
+            } else {
+                setSuggestions(data);
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
+function setSuggestions(data) {
+    const suggestions = document.getElementById("suggestions");
+
+    if (!data || data.length === 0) {
+        clearSuggestions();
+        return;
+    }
+
+    suggestions.style.display = "block";
+    suggestions.innerHTML = data
+        .map(member => `
+            <div class="suggestion-item" data-id="${member.member_id}" onclick="selectMember(${member.member_id})">
+                <strong>${member.full_name}</strong> (${member.designation}) - Frequency: ${member.frequency}
+            </div>
+        `)
+        .join("");
+}
+
+function selectMember(memberId) {
+    selectedMemberId = memberId;
+    clearSuggestions();
+    
+    // Fetch member details
+    fetch(`/members/${memberId}`, { credentials: "include" })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+    })
+    .then(data=>{
+        if (data.error) {
+            alert("Error: " + data.error);
+            return;
+        }
+        
+        // Fill form with member data
+        document.getElementById("full_name").value = data.full_name || "";
+        document.getElementById("designation").value = data.designation || "";
+        document.getElementById("age").value = data.age || "";
+        document.getElementById("gender").value = data.gender || "";
+        document.getElementById("join_date").value = data.join_date || "";
+        document.getElementById("assign_date").value = data.assign_date || "";
+        const contactsContainer = document.getElementById("contactsContainer");
+        const locationsContainer = document.getElementById("locationsContainer");
+        const emergencyContainer = document.getElementById("emergencyContainer");
+        contactsContainer.innerHTML = "";
+        locationsContainer.innerHTML = "";
+        emergencyContainer.innerHTML = "";
+
+        if (Array.isArray(data.contacts) && data.contacts.length) {
+            data.contacts.forEach(addContactRow);
+        } else {
+            addContactRow({
+                contact_type: data.contact_type || "",
+                contact_value: data.contact_value || "",
+                category_name: data.category_name || "",
+            });
+        }
+
+        if (Array.isArray(data.locations) && data.locations.length) {
+            data.locations.forEach(addLocationRow);
+        } else {
+            addLocationRow({
+                location_type: data.location_type || "",
+                building_name: data.building_name || "",
+                room_number: data.room_number || "",
+                category_name: data.category_name || "",
+            });
+        }
+
+        if (Array.isArray(data.emergency_contacts) && data.emergency_contacts.length) {
+            data.emergency_contacts.forEach(addEmergencyRow);
+        } else {
+            addEmergencyRow({
+                contact_person_name: data.emergency_name || "",
+                relation: data.relation || "",
+                emergency_phone: data.emergency_contact || "",
+                category_name: data.category_name || "",
+            });
+        }
+        document.getElementById("username").value = data.username || "";
+
+        originalMemberData = {
+            role_title: data.role_title || "",
+            full_name: data.full_name || "",
+            designation: data.designation || "",
+            age: data.age === null || data.age === undefined ? "" : String(data.age),
+            gender: data.gender || "",
+            join_date: data.join_date || "",
+            assign_date: data.assign_date || null,
+            contacts: Array.isArray(data.contacts) ? data.contacts : [],
+            locations: Array.isArray(data.locations) ? data.locations : [],
+            emergency_contacts: Array.isArray(data.emergency_contacts) ? data.emergency_contacts : [],
+            username: data.username || "",
+        };
+        
+        document.getElementById("searchScreenDiv").style.display = "none";
+        document.getElementById("updateForm").style.display = "block";
+    })
+    .catch(err => {
+        console.error("Error fetching member:", err);
+        alert("Error fetching member data: " + err.message);
+    });
+}
+
+document.getElementById("updateForm").addEventListener("submit", function(e){
+
+e.preventDefault()
+
+const currentData = {
+    role_title: document.getElementById("role_title").value,
+    full_name: document.getElementById("full_name").value,
+    designation: document.getElementById("designation").value,
+    age: document.getElementById("age").value,
+    gender: document.getElementById("gender").value,
+    join_date: document.getElementById("join_date").value,
+    assign_date: document.getElementById("assign_date").value || null,
+    contacts: collectContacts(),
+    locations: collectLocations(),
+    emergency_contacts: collectEmergencyContacts(),
+    username: document.getElementById("username").value,
+    password: document.getElementById("password").value || null
+};
+
+const formData = {};
+const baseline = originalMemberData || {};
+
+if (currentData.role_title !== (baseline.role_title || "")) formData.role_title = currentData.role_title;
+if (currentData.full_name !== (baseline.full_name || "")) formData.full_name = currentData.full_name;
+if (currentData.designation !== (baseline.designation || "")) formData.designation = currentData.designation;
+if (currentData.age !== (baseline.age || "")) formData.age = currentData.age;
+if (currentData.gender !== (baseline.gender || "")) formData.gender = currentData.gender;
+if (currentData.join_date !== (baseline.join_date || "")) formData.join_date = currentData.join_date;
+if ((currentData.assign_date || null) !== (baseline.assign_date || null)) formData.assign_date = currentData.assign_date;
+if (stableStringify(currentData.contacts) !== stableStringify(baseline.contacts)) formData.contacts = currentData.contacts;
+if (stableStringify(currentData.locations) !== stableStringify(baseline.locations)) formData.locations = currentData.locations;
+if (stableStringify(currentData.emergency_contacts) !== stableStringify(baseline.emergency_contacts)) formData.emergency_contacts = currentData.emergency_contacts;
+if (currentData.username !== (baseline.username || "")) formData.username = currentData.username;
+if (currentData.password) formData.password = currentData.password;
+
+if (Object.keys(formData).length === 0) {
+    alert("No changes detected.");
+    return;
+}
+
+fetch(`/members/${selectedMemberId}`, {
+method:"PUT",
+credentials: "include",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(formData)
+})
+.then(res=>res.json())
+.then(data=>{
+if(data.message){
+window.location.href="/success"
+}else{
+alert(data.error)
+}
+})
+
+})
+</script>
+
+</body>
+</html>

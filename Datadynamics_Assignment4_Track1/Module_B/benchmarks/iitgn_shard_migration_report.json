@@ -1,0 +1,198 @@
+{
+  "copied_per_shard": {
+    "shard_0": {
+      "Departments": 15,
+      "Data_Categories": 5,
+      "Roles": 12,
+      "Role_Permissions": 60,
+      "Members": 7,
+      "Member_Role_Assignments": 7,
+      "Contact_Details": 6,
+      "Locations": 7,
+      "Emergency_Contacts": 5,
+      "User_Credentials": 0,
+      "Search_Logs": 1,
+      "Audit_Trail": 7
+    },
+    "shard_1": {
+      "Departments": 15,
+      "Data_Categories": 5,
+      "Roles": 12,
+      "Role_Permissions": 60,
+      "Members": 8,
+      "Member_Role_Assignments": 8,
+      "Contact_Details": 8,
+      "Locations": 8,
+      "Emergency_Contacts": 7,
+      "User_Credentials": 0,
+      "Search_Logs": 8,
+      "Audit_Trail": 3
+    },
+    "shard_2": {
+      "Departments": 15,
+      "Data_Categories": 5,
+      "Roles": 12,
+      "Role_Permissions": 60,
+      "Members": 8,
+      "Member_Role_Assignments": 8,
+      "Contact_Details": 7,
+      "Locations": 8,
+      "Emergency_Contacts": 5,
+      "User_Credentials": 0,
+      "Search_Logs": 2,
+      "Audit_Trail": 2
+    }
+  },
+  "count_verification": {
+    "Departments": {
+      "source_count": 15,
+      "shard_counts": [
+        15,
+        15,
+        15
+      ],
+      "status": "OK"
+    },
+    "Data_Categories": {
+      "source_count": 5,
+      "shard_counts": [
+        5,
+        5,
+        5
+      ],
+      "status": "OK"
+    },
+    "Roles": {
+      "source_count": 12,
+      "shard_counts": [
+        12,
+        12,
+        12
+      ],
+      "status": "OK"
+    },
+    "Role_Permissions": {
+      "source_count": 60,
+      "shard_counts": [
+        60,
+        60,
+        60
+      ],
+      "status": "OK"
+    },
+    "Members": {
+      "source_count": 23,
+      "shard_counts": [
+        7,
+        8,
+        8
+      ],
+      "shard_sum": 23,
+      "status": "OK"
+    },
+    "Member_Role_Assignments": {
+      "source_count": 23,
+      "shard_counts": [
+        7,
+        8,
+        8
+      ],
+      "shard_sum": 23,
+      "status": "OK"
+    },
+    "Contact_Details": {
+      "source_count": 21,
+      "shard_counts": [
+        6,
+        8,
+        7
+      ],
+      "shard_sum": 21,
+      "status": "OK"
+    },
+    "Locations": {
+      "source_count": 23,
+      "shard_counts": [
+        7,
+        8,
+        8
+      ],
+      "shard_sum": 23,
+      "status": "OK"
+    },
+    "Emergency_Contacts": {
+      "source_count": 17,
+      "shard_counts": [
+        5,
+        7,
+        5
+      ],
+      "shard_sum": 17,
+      "status": "OK"
+    },
+    "User_Credentials": {
+      "source_count": 0,
+      "shard_counts": [
+        0,
+        0,
+        0
+      ],
+      "shard_sum": 0,
+      "status": "OK"
+    },
+    "Search_Logs": {
+      "source_count": 11,
+      "shard_counts": [
+        1,
+        8,
+        2
+      ],
+      "shard_sum": 11,
+      "status": "OK"
+    },
+    "Audit_Trail": {
+      "source_count": 12,
+      "shard_counts": [
+        7,
+        3,
+        2
+      ],
+      "shard_sum": 12,
+      "status": "OK"
+    }
+  },
+  "duplicate_verification": {
+    "Members": {
+      "duplicate_keys": 0,
+      "status": "OK"
+    },
+    "Member_Role_Assignments": {
+      "duplicate_keys": 0,
+      "status": "OK"
+    },
+    "Contact_Details": {
+      "duplicate_keys": 0,
+      "status": "OK"
+    },
+    "Locations": {
+      "duplicate_keys": 0,
+      "status": "OK"
+    },
+    "Emergency_Contacts": {
+      "duplicate_keys": 0,
+      "status": "OK"
+    },
+    "User_Credentials": {
+      "duplicate_keys": 0,
+      "status": "OK"
+    },
+    "Search_Logs": {
+      "duplicate_keys": 0,
+      "status": "OK"
+    },
+    "Audit_Trail": {
+      "duplicate_keys": 0,
+      "status": "OK"
+    }
+  }
+}

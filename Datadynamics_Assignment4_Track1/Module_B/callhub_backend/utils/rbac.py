@@ -35,6 +35,8 @@ def is_admin(member_id):
 
 
 def can_edit_others(role):
+    if not role:
+        return False
 
     result = shard_manager.execute_on_shard(0, """
         SELECT can_edit_others
@@ -42,6 +44,5 @@ def can_edit_others(role):
         WHERE role_title = %s
     """, (role,), fetch=True)
 
-    result = cur.fetchone()
-
-    return result and result[0] == 1
+    row = result[0] if result else None
+    return bool(row and row[0] == 1)

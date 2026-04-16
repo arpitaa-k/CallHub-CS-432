@@ -105,9 +105,12 @@ def recreate_shard_tables(source_cur, shard_cur, all_tables, shard_id, reset_tab
 
     shard_cur.execute("SET FOREIGN_KEY_CHECKS=0")
     if reset_tables:
-        for table_name in all_tables:
-            dst_table = table_name_map[table_name]
-            shard_cur.execute(f"DROP TABLE IF EXISTS `{dst_table}`")
+        # Cleanup stale shard tables from prior runs so each node only keeps
+        # the tables intended for its own shard_id in the current migration.
+        for cleanup_shard_id in range(NUM_SHARDS):
+            cleanup_map = build_table_name_map(all_tables, cleanup_shard_id)
+            for table_name in all_tables:
+                shard_cur.execute(f"DROP TABLE IF EXISTS `{cleanup_map[table_name]}`")
 
     for table_name in all_tables:
         dst_table = table_name_map[table_name]

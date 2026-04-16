@@ -1,17 +1,53 @@
 from flask import Blueprint, request, jsonify, session, redirect
-from db import mysql
-from MySQLdb import IntegrityError
 import bcrypt
 import uuid
+
 from utils.auth import generate_jwt
 from utils.logger import log_login_event
+from utils.shard_manager import shard_manager
+
 
 auth = Blueprint("auth", __name__)
 
+
+def _find_user_by_username(username):
+    for shard_id in range(3):
+        rows = shard_manager.execute_on_shard(
+            shard_id,
+            """
+            SELECT user_id, member_id, password_hash
+            FROM shard_{}_user_credentials
+            WHERE username=%s
+            LIMIT 1
+            """.format(shard_id),
+            (username,),
+            fetch=True,
+        )
+        if rows:
+            user_id, member_id, password_hash = rows[0]
+            return shard_id, user_id, member_id, password_hash
+    return None
+
+
+def _role_for_member(member_id):
+    shard_id = shard_manager.get_shard_id(member_id)
+    rows = shard_manager.execute_on_shard(
+        shard_id,
+        """
+        SELECT r.role_title
+        FROM shard_{}_member_role_assignments mra
+        JOIN shard_{}_roles r ON mra.role_id = r.role_id
+        WHERE mra.member_id = %s
+        LIMIT 1
+        """.format(shard_id, shard_id),
+        (member_id,),
+        fetch=True,
+    )
+    return rows[0][0] if rows else None
+
+
 @auth.route("/login", methods=["POST"])
 def login():
-
-    # Clear any existing session
     session.clear()
 
     data = request.json or {}
@@ -28,16 +64,7 @@ def login():
         )
         return jsonify({"error": "Username and password required"}), 400
 
-    cur = mysql.connection.cursor()
-
-    cur.execute("""
-        SELECT user_id, member_id, password_hash
-        FROM User_Credentials
-        WHERE username=%s
-    """,(username,))
-
-    user = cur.fetchone()
-
+    user = _find_user_by_username(username)
     if not user:
         log_login_event(
             username=username,
@@ -46,29 +73,17 @@ def login():
             ip=request.remote_addr,
             user_agent=request.headers.get("User-Agent"),
         )
-        return jsonify({"error":"Invalid username"}),401
+        return jsonify({"error": "Invalid username"}), 401
 
-    user_id, member_id, password_hash = user
-
+    _, user_id, member_id, password_hash = user
 
     if bcrypt.checkpw(password.encode(), password_hash.encode()):
         session.permanent = True
         session["user_id"] = user_id
         session["member_id"] = member_id
 
-        # Fetch role
-        cur.execute("""
-            SELECT r.role_title
-            FROM Member_Role_Assignments mra
-            JOIN Roles r ON mra.role_id = r.role_id
-            WHERE mra.member_id = %s
-            LIMIT 1
-        """, (member_id,))
-
-        role = cur.fetchone()
-        role_title = None
-        if role:
-            role_title = role[0]
+        role_title = _role_for_member(member_id)
+        if role_title:
             session["role"] = role_title
 
         jti = str(uuid.uuid4())
@@ -84,13 +99,15 @@ def login():
             jti=jti,
         )
 
-        return jsonify({
-            "message":"Login successful",
-            "member_id":member_id,
-            "token": token,
-            "token_type": "Bearer",
-            "expires_in_sec": 30 * 60,
-        })
+        return jsonify(
+            {
+                "message": "Login successful",
+                "member_id": member_id,
+                "token": token,
+                "token_type": "Bearer",
+                "expires_in_sec": 30 * 60,
+            }
+        )
 
     log_login_event(
         username=username,
@@ -100,13 +117,11 @@ def login():
         ip=request.remote_addr,
         user_agent=request.headers.get("User-Agent"),
     )
-    return jsonify({"error":"Invalid password"}),401
-
+    return jsonify({"error": "Invalid password"}), 401
 
 
 @auth.route("/check-admin")
 def check_admin():
-
     if "member_id" not in session:
         return {"is_admin": False}
 
@@ -115,41 +130,50 @@ def check_admin():
     role = session.get("role")
     return {"is_admin": can_edit_others(role)}
 
+
 @auth.route("/register", methods=["POST"])
 def register():
+    data = request.json or {}
 
-    data = request.json
-
-    username = data["username"]
-    password = data["password"]
+    username = data.get("username")
+    password = data.get("password")
     member_id = data.get("member_id")
 
-    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    if not username or not password or member_id is None:
+        return jsonify({"error": "username, password and member_id are required"}), 400
 
-    cur = mysql.connection.cursor()
+    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
-    # Check username uniqueness
-    cur.execute("SELECT 1 FROM User_Credentials WHERE username=%s", (username,))
-    if cur.fetchone():
+    # Username must be globally unique across shards.
+    existing_user = _find_user_by_username(username)
+    if existing_user:
         return jsonify({"error": "username already registered"}), 409
 
-    # If client provided member_id, ensure it's not already used
-    if member_id is not None:
-        cur.execute("SELECT 1 FROM User_Credentials WHERE member_id=%s", (member_id,))
-        if cur.fetchone():
-            return jsonify({"error": "member_id already registered"}), 409
+    shard_id = shard_manager.get_shard_id(int(member_id))
+
+    # Ensure member_id does not already have credentials on target shard.
+    rows = shard_manager.execute_on_shard(
+        shard_id,
+        "SELECT 1 FROM shard_{}_user_credentials WHERE member_id=%s LIMIT 1".format(shard_id),
+        (member_id,),
+        fetch=True,
+    )
+    if rows:
+        return jsonify({"error": "member_id already registered"}), 409
 
     try:
-        cur.execute("""
-            INSERT INTO User_Credentials
-            (member_id, username, password_hash)
-            VALUES (%s,%s,%s)
-        """, (member_id, username, hashed.decode()))
-        mysql.connection.commit()
-    except IntegrityError:
+        shard_manager.execute_on_shard(
+            shard_id,
+            """
+            INSERT INTO shard_{}_user_credentials (member_id, username, password_hash)
+            VALUES (%s, %s, %s)
+            """.format(shard_id),
+            (member_id, username, hashed),
+        )
+    except Exception:
         return jsonify({"error": "duplicate member_id or constraint violation"}), 409
 
-    return jsonify({"message": "User registered"})
+    return jsonify({"message": "User registered", "shard_id": shard_id})
 
 
 @auth.route("/logout")

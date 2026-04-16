@@ -4,7 +4,7 @@ This document captures the new Subtask 2 implementation using the instructor-pro
 
 ## Deployment constraints
 - Host: `10.0.116.184`
-- Shard ports: `3307`, `3308`, `3309`
+- MySQL shard ports: `3307`, `3308`, `3309`
 - Team DB user: `Data_Dynamics`
 - Team DB password: `password@123`
 - Team DB name: `Data_Dynamics`

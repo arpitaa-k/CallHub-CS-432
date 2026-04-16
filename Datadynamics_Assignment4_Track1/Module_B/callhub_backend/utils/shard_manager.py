@@ -1,5 +1,5 @@
 import pymysql
-from ..config import SHARD_HOST, SHARD_PORTS, TEAM_DB_USER, TEAM_DB_PASSWORD, TEAM_DB_NAME, NUM_SHARDS, SHARD_KEY, SHARD_STRATEGY
+from config import SHARD_HOST, SHARD_PORTS, TEAM_DB_USER, TEAM_DB_PASSWORD, TEAM_DB_NAME, NUM_SHARDS, SHARD_KEY, SHARD_STRATEGY
 
 class ShardManager:
     def __init__(self):
@@ -45,9 +45,17 @@ class ShardManager:
         return results
 
     def get_next_member_id(self):
-        # Get global max member_id from shard 0 to avoid race conditions
-        result = self.execute_on_shard(0, "SELECT MAX(member_id) FROM shard_0_members", fetch=True)
-        max_id = result[0][0] if result and result[0][0] else 0
+        # Compute global max across all shards to avoid cross-shard PK collisions.
+        max_id = 0
+        for shard_id in range(NUM_SHARDS):
+            result = self.execute_on_shard(
+                shard_id,
+                "SELECT MAX(member_id) FROM shard_{}_members".format(shard_id),
+                fetch=True,
+            )
+            shard_max = result[0][0] if result and result[0][0] else 0
+            if shard_max > max_id:
+                max_id = shard_max
         return max_id + 1
 
     def close_all(self):

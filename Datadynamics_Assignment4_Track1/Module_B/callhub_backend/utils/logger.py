@@ -59,11 +59,19 @@ def log_action(actor_id, table, record_id, action, source='API'):
 
     try:
         shard_id = shard_manager.get_shard_id(actor_id)
-        shard_manager.execute_on_shard(shard_id, """
-            INSERT INTO shard_{}_audit_trail
-            (actor_id, target_table, target_record_id, action_type, source)
-            VALUES (%s,%s,%s,%s,%s)
-        """.format(shard_id), (actor_id, table, record_id, action, source))
+        try:
+            shard_manager.execute_on_shard(shard_id, """
+                INSERT INTO shard_{}_audit_trail
+                (actor_id, target_table, target_record_id, action_type, source)
+                VALUES (%s,%s,%s,%s,%s)
+            """.format(shard_id), (actor_id, table, record_id, action, source))
+        except Exception:
+            # Some deployments do not include the optional source column.
+            shard_manager.execute_on_shard(shard_id, """
+                INSERT INTO shard_{}_audit_trail
+                (actor_id, target_table, target_record_id, action_type)
+                VALUES (%s,%s,%s,%s)
+            """.format(shard_id), (actor_id, table, record_id, action))
     except Exception:
         # fallback silently
         pass

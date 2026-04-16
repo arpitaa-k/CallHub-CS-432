@@ -29,5 +29,5 @@
 
 ## 6) Deployment context used
 - Host: `10.0.116.184`
-- Shard ports: `3307`, `3308`, `3309`
+- MySQL shard ports: `3307`, `3308`, `3309`
 - Team DB/User: `Data_Dynamics`

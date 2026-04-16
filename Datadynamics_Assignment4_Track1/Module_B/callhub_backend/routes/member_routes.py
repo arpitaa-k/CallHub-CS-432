@@ -121,12 +121,12 @@ def get_members():
                 SELECT m.member_id, m.full_name, m.designation
                 FROM shard_{}_members m
                 JOIN shard_{}_member_role_assignments mra ON m.member_id = mra.member_id
-                JOIN Roles r ON mra.role_id = r.role_id
+                JOIN shard_{}_roles r ON mra.role_id = r.role_id
                 WHERE r.role_title = %s AND m.is_deleted = 0
             """
             data = []
             for shard_id in range(3):  # NUM_SHARDS
-                result = shard_manager.execute_on_shard(shard_id, query.format(shard_id, shard_id), (role_filter,), fetch=True)
+                result = shard_manager.execute_on_shard(shard_id, query.format(shard_id, shard_id, shard_id), (role_filter,), fetch=True)
                 data.extend(result)
         else:
             query = """
@@ -267,13 +267,10 @@ def create_member():
                 VALUES (%s, %s)
             """.format(shard_id), (new_member_id, role_id))
 
-        # log audit trail - assuming audit is partitioned
-        shard_manager.execute_on_shard(shard_id, """
-            INSERT INTO shard_{}_audit_trail (actor_id, table_name, record_id, action)
-            VALUES (%s, %s, %s, %s)
-        """.format(shard_id), (actor_id, "Members", new_member_id, "INSERT"))
+        # Audit_Trail is partitioned by actor_id, so log on actor's shard.
+        log_action(actor_id, "Members", new_member_id, "INSERT")
 
-        return {"message":"Member created", "member_id": new_member_id}
+        return {"message":"Member created", "member_id": new_member_id, "shard_id": shard_id}
 
     except Exception as e:
         return {"error": str(e)}, 500
@@ -372,10 +369,10 @@ def get_member(id):
         result = shard_manager.execute_on_shard(shard_id, """
             SELECT cd.contact_type, cd.contact_value, dc.category_name
             FROM shard_{}_contact_details cd
-            JOIN Data_Categories dc ON cd.category_id = dc.category_id
+            JOIN shard_{}_data_categories dc ON cd.category_id = dc.category_id
             WHERE cd.member_id = %s
             ORDER BY cd.contact_id
-        """.format(shard_id), (id,), fetch=True)
+        """.format(shard_id, shard_id), (id,), fetch=True)
         data["contacts"] = [
             {
                 "contact_type": row[0],
@@ -401,10 +398,10 @@ def get_member(id):
         result = shard_manager.execute_on_shard(shard_id, """
             SELECT l.location_type, l.building_name, l.room_number, dc.category_name
             FROM shard_{}_locations l
-            JOIN Data_Categories dc ON l.category_id = dc.category_id
+            JOIN shard_{}_data_categories dc ON l.category_id = dc.category_id
             WHERE l.member_id = %s
             ORDER BY l.location_id
-        """.format(shard_id), (id,), fetch=True)
+        """.format(shard_id, shard_id), (id,), fetch=True)
         data["locations"] = [
             {
                 "location_type": row[0],
@@ -431,10 +428,10 @@ def get_member(id):
         result = shard_manager.execute_on_shard(shard_id, """
             SELECT ec.contact_person_name, ec.relation, ec.emergency_phone, dc.category_name
             FROM shard_{}_emergency_contacts ec
-            JOIN Data_Categories dc ON ec.category_id = dc.category_id
+            JOIN shard_{}_data_categories dc ON ec.category_id = dc.category_id
             WHERE ec.member_id = %s
             ORDER BY ec.record_id
-        """.format(shard_id), (id,), fetch=True)
+        """.format(shard_id, shard_id), (id,), fetch=True)
         data["emergency_contacts"] = [
             {
                 "contact_person_name": row[0],
@@ -460,10 +457,10 @@ def get_member(id):
         result = shard_manager.execute_on_shard(shard_id, """
             SELECT r.role_title, mra.assigned_date 
             FROM shard_{}_member_role_assignments mra
-            JOIN Roles r ON mra.role_id = r.role_id
+            JOIN shard_{}_roles r ON mra.role_id = r.role_id
             WHERE mra.member_id = %s 
             LIMIT 1
-        """.format(shard_id), (id,), fetch=True)
+        """.format(shard_id, shard_id), (id,), fetch=True)
         role_assignment = result[0] if result else None
         if role_assignment:
             data["role_title"] = role_assignment[0] if role_assignment[0] else ""
@@ -703,7 +700,7 @@ def search_member():
         AND m.is_deleted = 0
         AND EXISTS (
             SELECT 1 FROM shard_{}_member_role_assignments mra
-            JOIN Roles r ON mra.role_id = r.role_id
+            JOIN shard_{}_roles r ON mra.role_id = r.role_id
             WHERE mra.member_id = m.member_id
             AND r.role_title = %s
         )
@@ -712,7 +709,7 @@ def search_member():
         params = [f"{name}%", role]
         rows = []
         for shard_id in range(3):
-            result = shard_manager.execute_on_shard(shard_id, query.format(shard_id, shard_id), params, fetch=True)
+            result = shard_manager.execute_on_shard(shard_id, query.format(shard_id, shard_id, shard_id), params, fetch=True)
             rows.extend(result)
     else:
         query = """

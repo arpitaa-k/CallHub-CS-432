@@ -12,6 +12,9 @@ def get_portfolio(member_id):
     actor_shard = shard_manager.get_shard_id(actor_id)
     target_shard = shard_manager.get_shard_id(member_id)
 
+    # DEBUG: Verify single-key lookup routing
+    print(f"[DEBUG] portfolio lookup: member_id={member_id}, target_shard={target_shard}, actor_id={actor_id}, actor_shard={actor_shard}")
+
     is_owner = actor_id == member_id
 
     allowed_categories = []

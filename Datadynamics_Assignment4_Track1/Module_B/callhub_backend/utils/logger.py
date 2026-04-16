@@ -1,4 +1,4 @@
-from db import mysql
+from utils.shard_manager import shard_manager
 import os
 from datetime import datetime
 
@@ -58,40 +58,15 @@ def log_action(actor_id, table, record_id, action, source='API'):
     _append_log('audit.log', line)
 
     try:
-        cur = mysql.connection.cursor()
-    except Exception:
-        return
-
-    # no-op if already present.
-    try:
-        cur.execute("SELECT source FROM Audit_Trail LIMIT 1")
-    except Exception:
-        try:
-            cur.execute("ALTER TABLE Audit_Trail ADD COLUMN source VARCHAR(16) DEFAULT 'API'")
-            mysql.connection.commit()
-        except Exception:
-            # If alter fails, ignore;
-            pass
-
-    try:
-        cur.execute("""
-            INSERT INTO Audit_Trail
+        shard_id = shard_manager.get_shard_id(actor_id)
+        shard_manager.execute_on_shard(shard_id, """
+            INSERT INTO shard_{}_audit_trail
             (actor_id, target_table, target_record_id, action_type, source)
             VALUES (%s,%s,%s,%s,%s)
-        """, (actor_id, table, record_id, action, source))
-        mysql.connection.commit()
+        """.format(shard_id), (actor_id, table, record_id, action, source))
     except Exception:
-        # fallback:
-        try:
-            cur.execute("""
-                INSERT INTO Audit_Trail
-                (actor_id, target_table, target_record_id, action_type)
-                VALUES (%s,%s,%s,%s)
-            """, (actor_id, table, record_id, action))
-            mysql.connection.commit()
-        except Exception:
-            # give up silently to avoid breaking API flow;
-            print("Failed to write Audit_Trail entry")
+        # fallback silently
+        pass
 
 
 

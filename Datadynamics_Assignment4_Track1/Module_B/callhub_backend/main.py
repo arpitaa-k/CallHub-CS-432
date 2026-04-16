@@ -68,9 +68,10 @@ def home():
     if "member_id" not in session:
         return redirect("/")
     member_id = session.get("member_id")
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT full_name, designation FROM Members WHERE member_id=%s", (member_id,))
-    member = cur.fetchone()
+    from utils.shard_manager import shard_manager
+    shard_id = shard_manager.get_shard_id(member_id)
+    result = shard_manager.execute_on_shard(shard_id, "SELECT full_name, designation FROM shard_{}_members WHERE member_id=%s".format(shard_id), (member_id,), fetch=True)
+    member = result[0] if result else None
     name = member[0] if member else "User"
     role = member[1] if member else "Member"
     return render_template("Homepage.html", username=member_id, name=name, role=role)

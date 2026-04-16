@@ -1,5 +1,6 @@
 Flask
 mysql-connector-python
+pymysql
 dotenv
 Faker
 requests

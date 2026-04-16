@@ -1,37 +1,33 @@
-from db import mysql
+from utils.shard_manager import shard_manager
 
 def has_permission(member_id, category_id):
 
-    cur = mysql.connection.cursor()
+    shard_id = shard_manager.get_shard_id(member_id)
 
-    cur.execute("""
+    result = shard_manager.execute_on_shard(shard_id, """
         SELECT rp.can_view
-        FROM Member_Role_Assignments mra
+        FROM shard_{}_member_role_assignments mra
         JOIN Role_Permissions rp
         ON mra.role_id = rp.role_id
         WHERE mra.member_id=%s
         AND rp.category_id=%s
-    """, (member_id, category_id))
+    """.format(shard_id), (member_id, category_id), fetch=True)
 
-    result = cur.fetchone()
-
-    return result is not None and result[0] == 1
+    return len(result) > 0 and result[0][0] == 1
 
 
 def is_admin(member_id):
-    cur = mysql.connection.cursor()
+    shard_id = shard_manager.get_shard_id(member_id)
 
     # Check whether any of the member's assigned roles has can_edit_others flag set
-    cur.execute("""
+    result = shard_manager.execute_on_shard(shard_id, """
         SELECT r.can_edit_others
-        FROM Member_Role_Assignments mra
+        FROM shard_{}_member_role_assignments mra
         JOIN Roles r ON mra.role_id = r.role_id
         WHERE mra.member_id = %s
-    """, (member_id,))
+    """.format(shard_id), (member_id,), fetch=True)
 
-    rows = cur.fetchall()
-
-    for row in rows:
+    for row in result:
         if row and row[0] == 1:
             return True
 
@@ -40,13 +36,11 @@ def is_admin(member_id):
 
 def can_edit_others(role):
 
-    cur = mysql.connection.cursor()
-
-    cur.execute("""
+    result = shard_manager.execute_on_shard(0, """
         SELECT can_edit_others
         FROM Roles
         WHERE role_title = %s
-    """, (role,))
+    """, (role,), fetch=True)
 
     result = cur.fetchone()
 

@@ -126,6 +126,7 @@ def get_members():
             """
             data = []
             for shard_id in range(3):  # NUM_SHARDS
+                print(f"[DEBUG] GET /members role_filter={role_filter} shard={shard_id}")
                 result = shard_manager.execute_on_shard(shard_id, query.format(shard_id, shard_id, shard_id), (role_filter,), fetch=True)
                 data.extend(result)
         else:
@@ -136,6 +137,7 @@ def get_members():
             """
             data = []
             for shard_id in range(3):
+                print(f"[DEBUG] GET /members all shards shard={shard_id}")
                 result = shard_manager.execute_on_shard(shard_id, query.format(shard_id), fetch=True)
                 data.extend(result)
     else:
@@ -709,6 +711,7 @@ def search_member():
         params = [f"{name}%", role]
         rows = []
         for shard_id in range(3):
+            print(f"[DEBUG] GET /search role={role} name={name} shard={shard_id}")
             result = shard_manager.execute_on_shard(shard_id, query.format(shard_id, shard_id, shard_id), params, fetch=True)
             rows.extend(result)
     else:
@@ -727,6 +730,7 @@ def search_member():
         params = [f"{name}%"]
         rows = []
         for shard_id in range(3):
+            print(f"[DEBUG] GET /search name={name} shard={shard_id}")
             result = shard_manager.execute_on_shard(shard_id, query.format(shard_id), params, fetch=True)
             rows.extend(result)
 

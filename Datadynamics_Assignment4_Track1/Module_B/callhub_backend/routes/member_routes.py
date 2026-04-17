@@ -1,4 +1,6 @@
+from concurrent.futures import ThreadPoolExecutor
 from flask import Blueprint, jsonify, request, session
+from config import NUM_SHARDS
 from db import mysql
 from utils.auth import login_required
 from utils.rbac import can_edit_others
@@ -7,6 +9,17 @@ from utils.shard_manager import shard_manager
 import bcrypt
 
 members = Blueprint("members", __name__)
+
+
+def _query_shards_parallel(query_builder):
+    rows = []
+    with ThreadPoolExecutor(max_workers=NUM_SHARDS) as executor:
+        futures = {executor.submit(query_builder, shard_id): shard_id for shard_id in range(NUM_SHARDS)}
+        for future in futures:
+            result = future.result()
+            if result:
+                rows.extend(result)
+    return rows
 
 
 def _normalize_detail_entries(data):
@@ -116,7 +129,7 @@ def get_members():
     if can_edit_others(user_role):
         # Admin: can see all
         if role_filter:
-            # Query all shards
+            # Query all shards in parallel and merge results
             query = """
                 SELECT m.member_id, m.full_name, m.designation
                 FROM shard_{}_members m
@@ -124,22 +137,27 @@ def get_members():
                 JOIN shard_{}_roles r ON mra.role_id = r.role_id
                 WHERE r.role_title = %s AND m.is_deleted = 0
             """
-            data = []
-            for shard_id in range(3):  # NUM_SHARDS
-                print(f"[DEBUG] GET /members role_filter={role_filter} shard={shard_id}")
-                result = shard_manager.execute_on_shard(shard_id, query.format(shard_id, shard_id, shard_id), (role_filter,), fetch=True)
-                data.extend(result)
+            data = _query_shards_parallel(
+                lambda shard_id: shard_manager.execute_on_shard(
+                    shard_id,
+                    query.format(shard_id, shard_id, shard_id),
+                    (role_filter,),
+                    fetch=True,
+                )
+            )
         else:
             query = """
                 SELECT member_id, full_name, designation
                 FROM shard_{}_members
                 WHERE is_deleted = 0
             """
-            data = []
-            for shard_id in range(3):
-                print(f"[DEBUG] GET /members all shards shard={shard_id}")
-                result = shard_manager.execute_on_shard(shard_id, query.format(shard_id), fetch=True)
-                data.extend(result)
+            data = _query_shards_parallel(
+                lambda shard_id: shard_manager.execute_on_shard(
+                    shard_id,
+                    query.format(shard_id),
+                    fetch=True,
+                )
+            )
     else:
         # Regular user: only own
         shard_id = shard_manager.get_shard_id(actor_id)
@@ -709,11 +727,14 @@ def search_member():
         """
 
         params = [f"{name}%", role]
-        rows = []
-        for shard_id in range(3):
-            print(f"[DEBUG] GET /search role={role} name={name} shard={shard_id}")
-            result = shard_manager.execute_on_shard(shard_id, query.format(shard_id, shard_id, shard_id), params, fetch=True)
-            rows.extend(result)
+        rows = _query_shards_parallel(
+            lambda shard_id: shard_manager.execute_on_shard(
+                shard_id,
+                query.format(shard_id, shard_id, shard_id),
+                params,
+                fetch=True,
+            )
+        )
     else:
         query = """
         SELECT 
@@ -728,11 +749,14 @@ def search_member():
         """
 
         params = [f"{name}%"]
-        rows = []
-        for shard_id in range(3):
-            print(f"[DEBUG] GET /search name={name} shard={shard_id}")
-            result = shard_manager.execute_on_shard(shard_id, query.format(shard_id), params, fetch=True)
-            rows.extend(result)
+        rows = _query_shards_parallel(
+            lambda shard_id: shard_manager.execute_on_shard(
+                shard_id,
+                query.format(shard_id),
+                params,
+                fetch=True,
+            )
+        )
 
     # Format response
     result = []

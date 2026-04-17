@@ -13,10 +13,17 @@ members = Blueprint("members", __name__)
 
 def _query_shards_parallel(query_builder):
     rows = []
-    with ThreadPoolExecutor(max_workers=NUM_SHARDS) as executor:
-        futures = {executor.submit(query_builder, shard_id): shard_id for shard_id in range(NUM_SHARDS)}
-        for future in futures:
-            result = future.result()
+    shards = shard_manager.get_available_shards()
+    print(f"[SHARD] parallel range/search query across available shards: {shards}")
+    with ThreadPoolExecutor(max_workers=max(1, len(shards))) as executor:
+        futures = {executor.submit(query_builder, shard_id): shard_id for shard_id in shards}
+        for future, shard_id in futures.items():
+            try:
+                result = future.result()
+                print(f"[SHARD] completed query on shard {shard_id}; returned {len(result) if result else 0} rows")
+            except Exception as exc:
+                print(f"[SHARD] failed query on shard {shard_id}: {exc}")
+                continue
             if result:
                 rows.extend(result)
     return rows

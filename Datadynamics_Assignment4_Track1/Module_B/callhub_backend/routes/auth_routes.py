@@ -11,18 +11,22 @@ auth = Blueprint("auth", __name__)
 
 
 def _find_user_by_username(username):
-    for shard_id in range(3):
-        rows = shard_manager.execute_on_shard(
-            shard_id,
-            """
-            SELECT user_id, member_id, password_hash
-            FROM shard_{}_user_credentials
-            WHERE username=%s
-            LIMIT 1
-            """.format(shard_id),
-            (username,),
-            fetch=True,
-        )
+    for shard_id in shard_manager.get_available_shards():
+        try:
+            rows = shard_manager.execute_on_shard(
+                shard_id,
+                """
+                SELECT user_id, member_id, password_hash
+                FROM shard_{}_user_credentials
+                WHERE username=%s
+                LIMIT 1
+                """.format(shard_id),
+                (username,),
+                fetch=True,
+            )
+        except Exception as exc:
+            print(f"[SHARD] skipping shard {shard_id} during login search: {exc}")
+            continue
         if rows:
             user_id, member_id, password_hash = rows[0]
             return shard_id, user_id, member_id, password_hash

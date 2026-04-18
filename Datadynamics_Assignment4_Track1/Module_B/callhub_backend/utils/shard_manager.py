@@ -43,7 +43,6 @@ class ShardManager:
     def get_shard_id(self, member_id):
         if SHARD_STRATEGY == "hash_mod":
             return member_id % NUM_SHARDS
-        # Add other strategies if needed
         return 0
 
     def get_available_shards(self):
